@@ -24,7 +24,7 @@ If you use this work in your project or research, please cite the following pape
 
 - [ADF&TransApp, VLDB 2024](https://dl.acm.org/doi/10.14778/3632093.3632115). 
 
-## References
+### References
 
 > Adrien Petralia, Philippe Charpentier, and Themis Palpanas. ADF & TransApp: A Transformer-Based Framework for Appliance Detection Using Smart Meter Consumption Series. Proceedings of the VLDB Endowment (PVLDB), 17(3): 553 - 562, 2023.
 
