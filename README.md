@@ -12,16 +12,36 @@
 </p>
 </div>
 
-#### This work has been accepted for publication in the [Proceedings of the VLDB Endowment](https://www.vldb.org/pvldb/volumes/17) and will appear in the [50th International Conference on Very Large Databases (VLDB 2024)](https://vldb.org/2024/).
+Millions of smart meters have been installed by electricity suppliers worldwide during the last decade, allowing them to collect a large amount of electricity consumption data, albeit sampled at a low frequency (one point every 30min). 
+One of the important challenges these suppliers face is how to utilize these data to detect the presence/absence of different appliances in the customers' households. 
+This valuable information can help them provide personalized offers and recommendations to help customers towards the energy transition. 
+Appliance detection can be cast as a time series classification problem. 
+However, the large amount of data combined with the long and variable length of the consumption series pose challenges when training a classifier. 
+We propose ADF, a framework that uses subsequences of a client consumption series to detect the presence/absence of appliances. 
+We also introduce TransApp, a Transformer-based time series classifier that is first pretrained in a self-supervised way to enhance its performance on appliance detection tasks.
 
-Full text available at [ADF & TransApp](https://www.vldb.org/pvldb/vol17/p553-petralia.pdf).
+If you use this work in your project or research, please cite the following paper:
+
+- [ADF&TransApp, VLDB 2024](https://dl.acm.org/doi/10.14778/3632093.3632115). 
 
 ## References
-> Adrien Petralia, Philippe Charpentier, and Themis Palpanas. ADF & TransApp:
-> A Transformer-Based Framework for Appliance Detection Using Smart Meter Consumption Series.
-> Proceedings of the VLDB Endowment (PVLDB), 17(3): 553 - 562, 2023.
-> doi:10.14778/3632093.363211
 
+> Adrien Petralia, Philippe Charpentier, and Themis Palpanas. ADF & TransApp: A Transformer-Based Framework for Appliance Detection Using Smart Meter Consumption Series. Proceedings of the VLDB Endowment (PVLDB), 17(3): 553 - 562, 2023.
+
+```bibtex
+@article{petraliavldb24,
+author = {Petralia, Adrien and Charpentier, Philippe and Palpanas, Themis},
+title = {ADF \& TransApp: A Transformer-Based Framework for Appliance Detection Using Smart Meter Consumption Series},
+year = {2023},
+publisher = {VLDB Endowment},
+volume = {17},
+number = {3},
+issn = {2150-8097},
+journal={Proceedings of the VLDB Endowment},
+month = nov,
+pages = {553–562},
+}
+```
 
 ## Proposed approach
 
@@ -59,7 +79,7 @@ In addition, to reproduce papers experiments, use the following guidelines.
 
 Pretraining TransApp in a self-supervised way using non labeled data :
 
-```
+```bash
 sh LaunchTransAppPretraining.sh
 ```
 
@@ -67,7 +87,7 @@ sh LaunchTransAppPretraining.sh
 
 Use our Appliance Detection Framework combined with TransApp to detect appliance in consumption time series :
 
-```
+```bash
 sh LaunchTransAppClassif.sh
 ```
 
@@ -77,7 +97,7 @@ sh LaunchTransAppClassif.sh
 
 Use our Appliance Detection Framework combined with ConvNet, ResNet or InceptionTime to detect appliance in consumption time series :
 
-```
+```bash
 sh LaunchModelsClassif.sh
 ```
 
@@ -110,7 +130,7 @@ Overall, the required python packages are listed as follows:
 
 Use pip to install all the required libraries listed in the requirements.txt file.
 
-```
+```bash
 pip install -r requirements.txt
 ```
 
@@ -127,8 +147,8 @@ You may find more information on how to access the datasets in the [data](https:
 
 ## Contributors
 
-* [Adrien Petralia](https://adrienpetralia.github.io/), EDF R&D, Université Paris Cité
-* [Philippe Charpentier](https://www.researchgate.net/profile/Philippe-Charpentier), EDF R&D
+* [Adrien Petralia](https://adrienpetralia.github.io/), EDF Research, Université Paris Cité
+* [Philippe Charpentier](https://www.researchgate.net/profile/Philippe-Charpentier), EDF Research
 * [Themis Palpanas](https://helios2.mi.parisdescartes.fr/~themisp/), Université Paris Cité, IUF
 
 ## Acknowledgments
