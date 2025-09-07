@@ -21,7 +21,7 @@ from sklearn.preprocessing import StandardScaler
 root = Path(os.getcwd()).resolve().parents[0]
 sys.path.append(str(root))
 from experiments.data_utils import *
-from src.Models.TransApp import *
+from src.TransAppModel.TransApp import *
 from src.AD_Framework.Framework import *
 from src.utils.losses import *
 
