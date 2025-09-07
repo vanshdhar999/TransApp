@@ -2,7 +2,8 @@ data/Inputs/
 data/Labels/
 data/ExogeneData/
 tmp/
-
+transapp-v1
+.python-version
 *.csv
 *.pyc
 **/__pycache__/

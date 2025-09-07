@@ -1,0 +1,9 @@
+dataset: ComStock
+resolution: 15min
+num_houses: 1000
+num_appliances: 11
+appliances: ['cooling_ON', 'exterior_lighting_ON', 'fans_ON', 'heat_recovery_ON', 'heat_rejection_ON', 'heating_ON', 'interior_equipment_ON', 'interior_lighting_ON', 'pumps_ON', 'refrigeration_ON', 'water_systems_ON']
+house_id_range: 93 - 148985
+data_format: Similar to CER dataset format
+time_points: 35040
+input_data_shape: 1000 x 35040

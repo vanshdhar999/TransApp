@@ -171,16 +171,16 @@ class self_pretrainer(object):
             assert isinstance(dict_params_scheduler, dict)
             
             if name_scheduler=='MultiStepLR':
-                self.scheduler = torch.optim.lr_scheduler.MultiStepLR(self.optimizer, milestones=dict_params_scheduler['milestones'], gamma=dict_params_scheduler['gamma'], verbose=self.verbose)
+                self.scheduler = torch.optim.lr_scheduler.MultiStepLR(self.optimizer, milestones=dict_params_scheduler['milestones'], gamma=dict_params_scheduler['gamma'])
 
             elif name_scheduler=='CosineAnnealingLR':
-                self.scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(self.optimizer, T_max=dict_params_scheduler['T_max'], eta_min=dict_params_scheduler['eta_min'], verbose=self.verbose)
+                self.scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(self.optimizer, T_max=dict_params_scheduler['T_max'], eta_min=dict_params_scheduler['eta_min'])
 
             elif name_scheduler=='CosineAnnealingWarmRestarts':
-                self.scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(self.optimizer, T_0=dict_params_scheduler['T_0'], T_mult=dict_params_scheduler['T_mult'], eta_min=dict_params_scheduler['eta_min'], verbose=self.verbose)
+                self.scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(self.optimizer, T_0=dict_params_scheduler['T_0'], T_mult=dict_params_scheduler['T_mult'], eta_min=dict_params_scheduler['eta_min'])
 
             elif name_scheduler=='ExponentialLR':
-                self.scheduler = torch.optim.lr_scheduler.ExponentialLR(self.optimizer, gamma=dict_params_scheduler['gamma'], verbose=self.verbose)
+                self.scheduler = torch.optim.lr_scheduler.ExponentialLR(self.optimizer, gamma=dict_params_scheduler['gamma'])
 
             else:
                 raise ValueError('Type of scheduler {} unknown, only "MultiStepLR", "ExponentialLR", "CosineAnnealingLR" or "CosineAnnealingWarmRestarts".'.format(encoding_type))
@@ -228,6 +228,7 @@ class self_pretrainer(object):
                 self.loss_valid_history.append(valid_loss)
 
             # =======================verbose======================= #
+            print(f'Verbose is True if : {self.verbose}')
             if self.verbose:
                 print('Epoch [{}/{}]'.format(epoch + 1, n_epochs))
                 print('    Train loss : {:.6f}'.format(train_loss))
@@ -486,6 +487,7 @@ class BasedClassifTrainer(object):
         
             # =======================verbose======================= #
             if self.verbose:
+                print(f"************************************Verbose is true************************************")
                 print('Epoch [{}/{}]'.format(epoch+1, n_epochs))
                 print('    Train loss : {:.4f}, Train acc : {:.2f}%'
                           .format(train_loss, train_accuracy*100))

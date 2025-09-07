@@ -377,3 +377,132 @@ class WindowOversampler():
                 Mat = Mat.astype(np.float32)
                 
                 return Mat[:, :-1], Mat[:, -1]
+
+
+def COMSTOCK_get_data_case(case_name, resolution='15min', seed=0, win=1024, ratio_resample=0.8):
+    """
+    Load ComStock data for a specific appliance case
+    
+    Args:
+        case_name: Name of the appliance case (e.g., 'dishwasher_case')
+        resolution: Data resolution (e.g., '15min')
+        seed: Random seed for reproducibility
+        win: Window size for time series slicing
+        ratio_resample: Ratio for resampling if class imbalance is too high
+        
+    Returns:
+        Tuple of training, validation, and test data
+    """
+    # Determine the correct input file based on available data
+    comstock_path = path_data + f'Comstock_{resolution}/'
+    
+    # Try to find the correct input file
+    input_files = [f for f in os.listdir(comstock_path + 'Inputs/') if f.startswith('x_comstock_') and f.endswith('.csv')]
+    if not input_files:
+        raise FileNotFoundError(f"No ComStock input files found in {comstock_path}Inputs/")
+    
+    # Use the first available input file (assuming there's only one per resolution)
+    input_file = input_files[0]
+    
+    # Load data and labels
+    data = pd.read_csv(comstock_path + f'Inputs/{input_file}').set_index('id_pdl')
+    case = pd.read_csv(comstock_path + f'Labels/{case_name}.csv').set_index('id_pdl')
+    
+    print(f"Loaded ComStock {resolution} data: {data.shape}")
+    print(f"Loaded {case_name} labels: {case.shape}")
+    
+    # Merge data with labels
+    X = pd.merge(data, case, on='id_pdl')
+    print(f"Merged data shape: {X.shape}")
+    
+    # Split data into train, validation, and test sets
+    X_train, y_train, X_valid, y_valid, X_test, y_test = split_train_valid_test_pdl(X, test_size=0.2, 
+                                                                                    valid_size=0.2, seed=seed)
+    
+    # Keep copies for voting/ensemble methods
+    X_train_voter = X_train.copy()
+    y_train_voter = y_train.copy()
+    X_valid_voter = X_valid.copy()
+    y_valid_voter = y_valid.copy()
+    X_test_voter  = X_test.copy()
+    y_test_voter  = y_test.copy()
+
+    # Check class imbalance and decide on resampling
+    ratio = y_train.sum() / (len(y_train) - y_train.sum()) if (len(y_train) - y_train.sum()) > y_train.sum() else (len(y_train) - y_train.sum()) / y_train.sum()
+    equalize_class = ratio <= ratio_resample
+    
+    print(f"Class ratio: {ratio:.3f}, Equalize classes: {equalize_class}")
+
+    # No exogenous variables for ComStock (m=1)
+    m = 1
+
+    # Create window slicers
+    train_slicer = MTWindowSlicer(equalize_class=equalize_class, 
+                                  sampling_strategy=ratio_resample, 
+                                  seed=seed)
+    test_valid_slicer = MTWindowSlicer(equalize_class=False, seed=seed)
+
+    # Apply window slicing
+    X_train, y_train = train_slicer.fit_transform(X_train, y_train, m=m, win=win)
+    X_valid, y_valid = test_valid_slicer.fit_transform(X_valid, y_valid, m=m, win=win)
+    X_test, y_test   = test_valid_slicer.fit_transform(X_test, y_test, m=m, win=win)
+
+    # Reshape data to 3D format [batch_size, channels, sequence_length]
+    X_train = np.reshape(X_train, (X_train.shape[0], m, X_train.shape[-1]//m))
+    X_valid = np.reshape(X_valid, (X_valid.shape[0], m, X_valid.shape[-1]//m))
+    X_test  = np.reshape(X_test,  (X_test.shape[0],  m, X_test.shape[-1]//m))
+
+    print(f"Final shapes - Train: {X_train.shape}, Valid: {X_valid.shape}, Test: {X_test.shape}")
+
+    returned_tuple = (X_train, y_train, X_valid, y_valid, X_test, y_test, 
+                     X_train_voter, y_train_voter, X_valid_voter, y_valid_voter, 
+                     X_test_voter, y_test_voter)
+
+    return returned_tuple
+
+
+def COMSTOCK_get_data_pretraining(resolution='15min', seed=0, win=1024, entire_curve_normalization=True):
+    """
+    Load ComStock data for pretraining (unsupervised learning)
+    
+    Args:
+        resolution: Data resolution (e.g., '15min')
+        seed: Random seed for reproducibility
+        win: Window size for time series slicing
+        entire_curve_normalization: Whether to normalize the entire time series
+        
+    Returns:
+        X_train: Training data for pretraining
+    """
+    # Load ComStock data
+    comstock_path = path_data + f'Comstock_{resolution}/'
+    
+    # Find the correct input file
+    input_files = [f for f in os.listdir(comstock_path + 'Inputs/') if f.startswith('x_comstock_') and f.endswith('.csv')]
+    if not input_files:
+        raise FileNotFoundError(f"No ComStock input files found in {comstock_path}Inputs/")
+    
+    input_file = input_files[0]
+    data = pd.read_csv(comstock_path + f'Inputs/{input_file}').set_index('id_pdl')
+    
+    print(f"Loaded ComStock {resolution} data for pretraining: {data.shape}")
+    
+    # Normalize the data if requested
+    if entire_curve_normalization:
+        data = pd.DataFrame(StandardScaler().fit_transform(data.T).T, 
+                           columns=data.columns, index=data.index)
+        print("Applied entire curve normalization")
+    
+    # No exogenous variables for ComStock (m=1)
+    m = 1
+
+    # Create window slicer
+    slicer = MTWindowSlicer(seed=seed)
+
+    # Apply window slicing
+    X_train = slicer.fit_transform(data.values, m=m, win=win)
+    X_train = np.reshape(X_train, (X_train.shape[0], m, X_train.shape[-1]//m))
+
+    print(f"Pretraining data shape: {X_train.shape}")
+
+    return X_train
