@@ -411,6 +411,9 @@ def COMSTOCK_get_data_case(case_name, resolution='15min', seed=0, win=1024, rati
     print(f"Loaded ComStock {resolution} data: {data.shape}")
     print(f"Loaded {case_name} labels: {case.shape}")
     
+    # Validate and clean data before merging
+    data = validate_comstock_data(data, f"ComStock_{resolution}_{case_name}")
+    
     # Merge data with labels
     X = pd.merge(data, case, on='id_pdl')
     print(f"Merged data shape: {X.shape}")
@@ -461,6 +464,60 @@ def COMSTOCK_get_data_case(case_name, resolution='15min', seed=0, win=1024, rati
     return returned_tuple
 
 
+def validate_comstock_data(data, data_name="data"):
+    """
+    Validate and clean ComStock data to prevent sklearn warnings
+    
+    Args:
+        data: pandas DataFrame
+        data_name: name for logging
+    
+    Returns:
+        cleaned data
+    """
+    print(f"Validating {data_name}...")
+    original_shape = data.shape
+    
+    # Check for NaN values
+    nan_count = data.isnull().sum().sum()
+    if nan_count > 0:
+        print(f"Found {nan_count} NaN values, filling with median...")
+        data = data.fillna(data.median())
+    
+    # Check for infinity values
+    inf_count = np.isinf(data.select_dtypes(include=[np.number])).sum().sum()
+    if inf_count > 0:
+        print(f"Found {inf_count} infinity values, replacing with median...")
+        data = data.replace([np.inf, -np.inf], np.nan).fillna(data.median())
+    
+    # Check for constant columns (zero variance) - critical for StandardScaler
+    numeric_cols = data.select_dtypes(include=[np.number]).columns
+    constant_cols = []
+    for col in numeric_cols:
+        if data[col].std() == 0:
+            constant_cols.append(col)
+    
+    if constant_cols:
+        print(f"Found {len(constant_cols)} constant columns, adding small noise to prevent scaling issues...")
+        for col in constant_cols:
+            # Add very small random noise to prevent zero variance
+            data[col] = data[col] + np.random.normal(0, 1e-6, len(data))
+    
+    # Additional check for very small variance that could cause numerical issues
+    low_var_cols = []
+    for col in numeric_cols:
+        if 0 < data[col].std() < 1e-10:
+            low_var_cols.append(col)
+    
+    if low_var_cols:
+        print(f"Found {len(low_var_cols)} very low variance columns, adding stabilizing noise...")
+        for col in low_var_cols:
+            data[col] = data[col] + np.random.normal(0, 1e-6, len(data))
+    
+    print(f"Data validation complete. Shape: {original_shape} -> {data.shape}")
+    return data
+
+
 def COMSTOCK_get_data_pretraining(resolution='15min', seed=0, win=1024, entire_curve_normalization=True):
     """
     Load ComStock data for pretraining (unsupervised learning)
@@ -486,6 +543,9 @@ def COMSTOCK_get_data_pretraining(resolution='15min', seed=0, win=1024, entire_c
     data = pd.read_csv(comstock_path + f'Inputs/{input_file}').set_index('id_pdl')
     
     print(f"Loaded ComStock {resolution} data for pretraining: {data.shape}")
+    
+    # Validate and clean data before normalization
+    data = validate_comstock_data(data, f"ComStock_{resolution}_pretraining")
     
     # Normalize the data if requested
     if entire_curve_normalization:

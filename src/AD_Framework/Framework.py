@@ -417,7 +417,6 @@ class BasedClassifTrainer(object):
         if patience_rlr is not None:
             self.scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, 'min', 
                                                                         patience=patience_rlr, 
-                                                                        verbose=self.verbose,
                                                                         eps=1e-7)
             
         #if n_warmup_epochs > 0 and self.scheduler is not None:
@@ -431,7 +430,7 @@ class BasedClassifTrainer(object):
         self.eval_time = 0
         self.voter_time = 0
         self.passed_epochs = 0
-        self.best_loss = np.Inf
+        self.best_loss = np.inf
         self.loss_train_history = []
         self.loss_valid_history = []
         self.accuracy_train_history = []
