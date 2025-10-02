@@ -17,7 +17,7 @@ import torch
 import torch.nn as nn
 
 from sklearn.preprocessing import StandardScaler
-
+from pathlib import Path
 root = Path(os.getcwd()).resolve().parents[0]
 sys.path.append(str(root))
 from experiments.data_utils import *

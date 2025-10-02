@@ -6,5 +6,5 @@
 #SBATCH -o ./job_outputs/TransAppClf.out
 #SBATCH -e ./job_outputs/TransAppClf.err
 
-. /env/activate myenv
+# . /env/activate myenv
 python3 RunTransAppClassif.py $1 $2 $3 $4

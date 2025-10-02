@@ -1,4 +1,5 @@
 #!/bin/bash
+
 declare -a type_embed=("0" "1")
 declare -a dim_model=("64" "96" "128")
 

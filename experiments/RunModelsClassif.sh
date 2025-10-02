@@ -6,5 +6,5 @@
 #SBATCH -o ./job_outputs/output.out
 #SBATCH -e ./job_outputs/error.err
 
-. /env/activate myenv
+# . /env/activate myenv
 python3 RunModelsClassif.py $1 $2
