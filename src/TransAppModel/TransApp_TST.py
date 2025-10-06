@@ -103,9 +103,9 @@ class _MultiHeadAttention(nn.Module):
 
 def get_activation_fn(activation):
     if activation.lower() == "relu":
-        return F.relu
+        return nn.relu
     elif activation.lower() == "gelu":
-        return F.gelu
+        return nn.GELU()
     else:
         raise ValueError(f'{activation} is not available. You can use "relu" or "gelu"')
 
@@ -403,7 +403,7 @@ def get_transapp_tst_model(m, win, dim_model, mode="pretraining",
 
     if path_select_core is not None:
         try:
-            checkpoint = torch.load(path_select_core, map_location='cpu')
+            checkpoint = torch.load(path_select_core, map_location='cpu', weights_only=False)
             TApp.load_state_dict(checkpoint['model_state_dict'], strict=False)
             print(f"✅ Loaded weights from {path_select_core}")
         except Exception as e:

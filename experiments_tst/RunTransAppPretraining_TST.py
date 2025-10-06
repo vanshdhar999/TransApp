@@ -50,7 +50,7 @@ def launch_pretraining(model,
 
     return
 
-def get_model_inst_tst(m, win, dim_model, use_tst_pos=True, norm="BatchNorm"):
+def get_model_inst_tst(m, win, dim_model, use_tst_pos=False, norm="BatchNorm"):
     """
     Get TST-enhanced TransApp model instance
     """

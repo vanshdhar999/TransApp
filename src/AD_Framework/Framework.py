@@ -520,7 +520,7 @@ class BasedClassifTrainer(object):
             self.plot_history()
             
         if self.save_checkpoint:
-            self.log['best_model_state_dict'] = torch.load(self.path_checkpoint+'.pt')['model_state_dict']
+            self.log['best_model_state_dict'] = torch.load(self.path_checkpoint+'.pt', weights_only=False)['model_state_dict']
         
         # =======================update log======================= #
         self.log['training_time'] = self.train_time
