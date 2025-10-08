@@ -333,7 +333,7 @@ if __name__ == "__main__":
             # Get data based on dataset type
             if dataset_type == 'CER':
                 datas_tuple = CER_get_data_case(case_name, seed=rd_state, exo_variable=exo_vars,
-                                              win=win, ratio_resample=0.8, group='residential')
+                                              win=win, ratio_resample=0.8)
             elif dataset_type == 'COMSTOCK':
                 datas_tuple = COMSTOCK_get_data_case(case_name, seed=rd_state)
             else:

@@ -1,0 +1,53 @@
+{
+  "timestamp": "2025-10-07T23:51:31.792661",
+  "case_name": "cooker_case",
+  "model_name": "TransApp_TST",
+  "dim_model": 96,
+  "configuration": {
+    "embed_type": 0,
+    "exo_variables": [],
+    "random_seed": 0,
+    "dataset_type": "CER",
+    "norm_type": "BatchNorm",
+    "parameters": {
+      "lr": 0.0001,
+      "wd": 0.001,
+      "batch_size": 16,
+      "epochs": 15,
+      "p_es": 5,
+      "p_rlr": 3,
+      "n_warmup_epochs": 0
+    }
+  },
+  "results": {
+    "subsequence_metrics": [
+      0.5660202348683653,
+      {
+        "ACCURACY": 0.7311648357923439,
+        "PRECISION": 0.4469649112731867,
+        "RECALL": 0.458241337690247,
+        "PRECISION_MACRO": 0.6360747175130835,
+        "RECALL_MACRO": 0.6383811844489227,
+        "F1_SCORE": 0.4525328875645032,
+        "F1_SCORE_MACRO": 0.6371860791636867,
+        "F1_SCORE_WEIGHTED": 0.732294394492391,
+        "CONFUSION_MATRIX": "[[15566 18403]\n [19260 86868]]"
+      }
+    ],
+    "quantile_metrics": {
+      "ACCURACY": 0.7804878048780488,
+      "PRECISION": 0.5377358490566038,
+      "RECALL": 0.6745562130177515,
+      "PRECISION_MACRO": 0.7121668936004668,
+      "RECALL_MACRO": 0.7444750762058454,
+      "F1_SCORE": 0.5984251968503937,
+      "F1_SCORE_MACRO": 0.7236943358388197,
+      "F1_SCORE_WEIGHTED": 0.7882160300954122,
+      "CONFUSION_MATRIX": "[[114  55]\n [ 98 430]]",
+      "ROC_AUC_SCORE": 0.817811995696611,
+      "ROC_AUC_SCORE_MACRO": 0.817811995696611,
+      "ROC_AUC_SCORE_WEIGHTED": 0.817811995696611
+    },
+    "best_quantile": null
+  }
+}

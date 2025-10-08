@@ -1,0 +1,37 @@
+{
+  "timestamp": "2025-10-07T18:04:01.880537",
+  "configuration": {
+    "embed_type": 1,
+    "dim_model": 96,
+    "epochs": 10,
+    "exo_variables": [
+      "hours_cos",
+      "hours_sin",
+      "days_cos",
+      "days_sin"
+    ]
+  },
+  "results": [
+    {
+      "model_name": "Standard TransApp",
+      "training_time": 2215.042311191559,
+      "final_loss": null,
+      "total_params": 367203,
+      "trainable_params": 367203
+    },
+    {
+      "model_name": "TST TransApp (BatchNorm)",
+      "training_time": 731.7885980606079,
+      "final_loss": null,
+      "total_params": 465315,
+      "trainable_params": 465315
+    },
+    {
+      "model_name": "TST TransApp (LayerNorm)",
+      "training_time": 774.5621421337128,
+      "final_loss": null,
+      "total_params": 465315,
+      "trainable_params": 465315
+    }
+  ]
+}
