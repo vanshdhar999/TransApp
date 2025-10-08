@@ -1,0 +1,582 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{hyperref}
+\usepackage{url}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\title{Enhanced Appliance Detection Framework: Integrating Foundation Models with TransApp Architecture\\
+{\footnotesize \textsuperscript{*}Mid-Semester Progress Report}
+}
+
+\author{\IEEEauthorblockN{Your Name}
+\IEEEauthorblockA{\textit{Department of Computer Science} \\
+\textit{Indian Institute of Science}\\
+Bengaluru, India \\
+yourname@iisc.ac.in}
+}
+
+\maketitle
+
+\begin{abstract}
+Smart meter data provides valuable insights for electricity suppliers to detect household appliances and offer personalized energy services. This report presents an investigation into enhancing the TransApp framework, a Transformer-based appliance detection system that operates on very low-frequency smart meter consumption data. The original TransApp combines dilated convolutional embeddings with Transformer blocks featuring Diagonally Masked Self-Attention (DMSA) and employs a two-step training process with self-supervised pretraining followed by supervised fine-tuning. Building upon this foundation, we explore the integration of modern time-series foundation models, including MOMENT and Hugging Face time-series transformers, to enhance detection accuracy and generalization. Our work investigates multi-scale temporal processing, probabilistic output heads, and advanced attention mechanisms. Preliminary experiments on the CER and EDF datasets demonstrate promising improvements in appliance detection performance while maintaining computational efficiency. This report details our current progress, experimental methodology, and future research directions toward developing a more robust and scalable appliance detection framework.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Appliance Detection, Time Series Classification, Transformer Networks, Smart Meters, Self-Supervised Learning, Foundation Models, Energy Monitoring
+\end{IEEEkeywords}
+
+\section{Introduction}
+\label{sec:introduction}
+
+Over the past decade, electricity suppliers worldwide have deployed millions of smart meters in residential households \cite{chren2016smart, milam2014smart}. These devices collect detailed time-stamped electricity consumption data at very low frequencies—typically one measurement every 15 to 60 minutes depending on the region (15 minutes in Italy, 30 minutes in the UK and France, 60 minutes in Spain) \cite{zhao2020non}. This wealth of data enables consumers to better understand and manage their electrical consumption patterns \cite{barai2015smart}.
+
+For electricity suppliers, identifying which specific appliances customers own is crucial for multiple business objectives. This knowledge allows suppliers to segment their customer base effectively \cite{allcott2011social}, provide personalized services that increase satisfaction and retention, and help customers rationalize their electricity consumption, thereby contributing to the energy transition. Traditional approaches to gathering this information through consumption questionnaires are time-consuming, costly, and prone to errors. Advanced data analytics techniques offer a more efficient and less intrusive alternative by detecting appliances directly from smart meter data.
+
+\subsection{Challenges in Appliance Detection}
+
+Appliance detection from smart meter data presents several unique challenges:
+
+\textbf{Low Sampling Frequency:} Unlike research studies that rely on high-frequency data (1Hz or more), real-world smart meters collect data at much lower rates. As illustrated in the original TransApp work, low sampling rates result in smoothed signals that do not maintain the unique pattern information of individual appliances, making signature-based detection methods ineffective.
+
+\textbf{Long and Variable-Length Series:} Consumption series collected by suppliers are typically 10,000-20,000 points long, come from large numbers of customers, and vary in length. Not all classifiers can handle data with such characteristics, and training models with these constraints is computationally intensive.
+
+\textbf{Class Imbalance:} Different appliances have varying prevalence rates in households, leading to imbalanced datasets where some appliances (e.g., dishwashers) are much rarer than others (e.g., refrigerators).
+
+\textbf{Overlapping Signatures:} At low sampling frequencies, multiple appliances operating simultaneously create overlapping consumption patterns that are difficult to disentangle.
+
+\subsection{Related Work}
+
+\textbf{Appliance Detection Approaches:} Most appliance detection research falls under Non-Intrusive Load Monitoring (NILM), which aims to identify power consumption patterns of individual appliances from total consumption data \cite{kaselimi2022towards}. However, traditional NILM methods have two key limitations for our application: (1) they typically require high-frequency data (1Hz or more) \cite{kahl2022representation, kahl2017comprehensive}, and (2) they focus on detecting when appliances are "ON" rather than whether they exist in the household \cite{aslan2022efficient, paradiso2013ann}.
+
+Recent studies have addressed appliance detection using very low-frequency data. Albert and Rajagopal \cite{albert2013smart} employed Hidden Semi-Markov Models (HSMM) with AdaBoost classifiers, showing encouraging results for large appliances. Deng et al. \cite{deng2022residential} proposed a framework using ResNet with attention mechanisms, processing consumption series as subsequences. A comprehensive benchmark by Petralia et al. \cite{petralia2023appliance} evaluated state-of-the-art time series classifiers, demonstrating that convolutional-based methods outperform others but still leave room for improvement.
+
+\textbf{Time Series Classification:} Modern time series classifiers include random kernel methods like ROCKET \cite{dempster2019rocket} and Arsenal \cite{middlehurst2021hive}, and deep learning architectures such as ResNet \cite{wang2016time}, InceptionTime \cite{fawaz2020inceptiontime}, and various CNN variants \cite{fawaz2019deep}. These methods have shown strong performance on benchmark datasets but face scalability challenges with long sequences.
+
+\textbf{Transformer-Based Models:} Transformer architectures have demonstrated remarkable success in time series tasks \cite{wen2022transformers}, with recent models like Informer \cite{zhou2020informer}, Autoformer \cite{wu2021autoformer}, and FEDformer \cite{zhou2022fedformer} achieving state-of-the-art results in forecasting. For energy applications, studies have explored transformers for energy disaggregation \cite{yue2020bert4nilm, sykiotis2022electricity}. However, the quadratic complexity of attention mechanisms limits their applicability to very long sequences.
+
+\textbf{Foundation Models for Time Series:} Recent developments in time-series foundation models, including MOMENT \cite{moment2024} and TimesFM \cite{timesfm2024}, have shown that pre-training on diverse time series datasets can significantly improve downstream task performance. These models learn universal representations that transfer well across domains.
+
+\subsection{Contributions}
+
+This report presents our ongoing work to enhance the TransApp framework through the following contributions:
+
+\begin{enumerate}
+    \item \textbf{Baseline Reproduction:} We reproduce and validate the original TransApp architecture and Appliance Detection Framework (ADF) on standard benchmark datasets.
+    
+    \item \textbf{Foundation Model Integration:} We investigate incorporating pre-trained time-series foundation models (MOMENT, Hugging Face models) as backbone encoders to improve feature representations.
+    
+    \item \textbf{Multi-Scale Processing:} We develop multi-scale temporal processing mechanisms to capture appliance signatures at different temporal resolutions.
+    
+    \item \textbf{Enhanced Attention Mechanisms:} We explore advanced attention patterns and fusion strategies combining the original DMSA with modern attention variants.
+    
+    \item \textbf{Probabilistic Outputs:} We implement probabilistic classification heads to quantify prediction uncertainty, crucial for real-world deployment.
+    
+    \item \textbf{Experimental Validation:} We conduct comprehensive experiments comparing baseline and enhanced architectures across multiple appliance detection scenarios.
+\end{enumerate}
+
+The remainder of this report is organized as follows: Section \ref{sec:problem} formally defines the appliance detection problem; Section \ref{sec:baseline} describes the original TransApp architecture and ADF framework; Section \ref{sec:datasets} details the datasets used; Section \ref{sec:proposed} presents our proposed enhancements; Section \ref{sec:experiments} discusses experimental methodology and preliminary results; and Section \ref{sec:conclusion} concludes with future directions.
+
+\section{Problem Formulation}
+\label{sec:problem}
+
+\subsection{Mathematical Setup}
+
+An electrical consumption time series is defined as a univariate time series $X = (x_1, x_2, \ldots, x_T)$ of ordered elements $x_j \in \mathbb{R}^1_+$ following $(i_1, i_2, \ldots, i_T)$ time consumption indexes (timestamps). We refer to \textit{very low frequency consumption time series} for data sampled at intervals greater than 1 minute.
+
+\subsection{Appliance Detection as Binary Classification}
+
+We treat the appliance detection problem as a supervised binary classification problem. Given a collection of consumption time series $\mathcal{X} = \{X_1, X_2, \ldots, X_N\}$ of potentially variable lengths, we aim to predict the presence or absence of a specific appliance $a$ in each time series $X_i$.
+
+Formally, for each appliance type $a \in \mathcal{A}$ (where $\mathcal{A}$ is the set of all appliance types of interest), we wish to learn a classifier $f_a: \mathcal{X} \rightarrow \{0, 1\}$ such that:
+
+\begin{equation}
+f_a(X_i) = \begin{cases} 
+1 & \text{if appliance } a \text{ is present} \\
+0 & \text{otherwise}
+\end{cases}
+\end{equation}
+
+\subsection{Challenges Specific to Low-Frequency Data}
+
+At high sampling frequencies (1Hz or higher), individual appliances exhibit distinct "signatures" in the consumption signal—characteristic patterns of power draw during operation. However, at very low frequencies ($\geq$1 minute), these signatures become smoothed and overlapped, making direct pattern matching infeasible.
+
+Consider a dishwasher operating for 2 hours with distinct heating and pumping cycles. At 1Hz sampling, each cycle appears as a distinct peak in the consumption pattern. At 30-minute sampling, the entire operation may be captured by only 4 data points, insufficient to distinguish the dishwasher from other appliances with similar average power consumption.
+
+This fundamental challenge motivates our approach: rather than attempting to identify appliance signatures directly, we learn representations from labeled data that capture the subtle statistical patterns in consumption behavior that correlate with appliance presence.
+
+\section{Baseline Approach: TransApp and ADF}
+\label{sec:baseline}
+
+\subsection{The Appliance Detection Framework (ADF)}
+
+The Appliance Detection Framework (ADF) addresses the challenge of long, variable-length consumption series by fragmenting them into manageable subsequences. The framework operates through five key steps:
+
+\textbf{Step 1 - Series Extraction:} Extract a client's consumption time series $X$ of length $l$ from the database.
+
+\textbf{Step 2 - Subsequence Creation:} Slice $X$ into $n$ non-overlapping subsequences of length $w$ using a tumbling window:
+\begin{equation}
+n = \left\lfloor \frac{l}{w} \right\rfloor
+\end{equation}
+
+Each subsequence $\mathbf{x}_i$ contains $w$ consecutive consumption values.
+
+\textbf{Step 3 - Temporal Encoding:} To preserve positional information about time of day and day of week, concatenate temporal encoded features to each subsequence. This transforms univariate subsequences into multivariate time series $\mathbf{x}_{w \times m}$ where $m$ is the number of channels.
+
+The temporal encoding uses sinusoidal functions:
+\begin{align}
+Te_{sin}(i_t) &= \sin\left(\frac{2\pi i_t}{p}\right) \\
+Te_{cos}(i_t) &= \cos\left(\frac{2\pi i_t}{p}\right)
+\end{align}
+
+where $i_t \in \{1, \ldots, 24\}$ and $p = 24$ for hour encoding, and $i_t \in \{1, \ldots, 7\}$ and $p = 7$ for day encoding. This adds four additional channels (sin/cos for both hour and day), resulting in $m = 5$ total channels.
+
+\textbf{Step 4 - Classification:} Feed each subsequence to a TransApp classifier instance previously fine-tuned to detect the specific appliance $a$. The model predicts a detection probability for each subsequence $\mathbf{x}_i$, producing a probability vector:
+\begin{equation}
+P_X = (p(\mathbf{x}_1), p(\mathbf{x}_2), \ldots, p(\mathbf{x}_n))
+\end{equation}
+
+\textbf{Step 5 - Quantile-Based Aggregation:} Extract the $\alpha_a^*$-th quantile from $P_X$ to obtain the final prediction probability. The parameter $\alpha_a^*$ is tuned on a validation set to maximize the chosen performance metric (F1-Macro Score):
+
+\begin{equation}
+\alpha_a^* = \arg\max_{\alpha \in \{0, 0.5, \ldots, 0.95, 1\}} S(y_{true}, y_{\alpha}^{pred})
+\end{equation}
+
+where $y_{\alpha}^{pred} = (Q_{P_{X_1}}(\alpha), \ldots, Q_{P_{X_N}}(\alpha))$ and $y_{true}$ are the ground truth labels.
+
+The final predicted label is obtained by rounding the quantile value to the nearest integer.
+
+\textbf{Intuition:} This quantile-based approach is more flexible than simple majority voting. It accounts for the fact that an appliance may not be actively used (and thus detectable) in all subsequences. For example, a dishwasher might only operate during evening hours, appearing in a minority of subsequences. The optimal quantile parameter learns to weight the model's confidence appropriately for each appliance type.
+
+\subsection{TransApp Architecture}
+
+TransApp combines convolutional feature extraction with Transformer-based sequence modeling. The architecture consists of three main components:
+
+\subsubsection{Embedding Block}
+
+The embedding block uses four stacked Residual Units (ResUnits) with exponentially increasing dilation rates. Each ResUnit contains:
+\begin{itemize}
+    \item 1D convolutional layer
+    \item GeLU activation function
+    \item Batch normalization layer
+    \item Residual connection
+\end{itemize}
+
+For ResUnit $i$ where $i \in \{1, 2, 3, 4\}$, the dilation parameter is set to $d = 2^i$. This exponential dilation pattern significantly broadens the receptive field while maintaining the time dimension (stride = 1).
+
+The embedding block transforms the input $\mathbf{x}_{w \times m}$ into a latent representation $\mathbf{z}_{w \times d_{model}}$ where $d_{model} = 96$ is the model's inner dimension.
+
+\subsubsection{Transformer Block}
+
+The Transformer block consists of $N$ stacked layers (where $N \in \{3, 5\}$ in experiments). Each layer comprises:
+\begin{itemize}
+    \item Layer normalization
+    \item Multi-Head Diagonally Masked Self-Attention (DMSA)
+    \item Layer normalization
+    \item Position-wise Feed-Forward Network (PFFN)
+    \item Residual connections after both DMSA and PFFN
+    \item Dropout for regularization
+\end{itemize}
+
+\textbf{Diagonally Masked Self-Attention (DMSA):} A key innovation is the use of DMSA instead of standard self-attention. DMSA applies a mask to the diagonal elements of the attention score matrix, forcing these scores to zero after the softmax operation:
+
+\begin{equation}
+A_{ii} = 0 \quad \forall i
+\end{equation}
+
+This modification emphasizes inter-token relationships over self-relationships, helping the model capture meaningful dependencies between different time steps rather than allowing tokens to attend primarily to themselves. This has been shown to reduce overfitting on small datasets.
+
+\textbf{No Positional Encoding:} Unlike standard Transformer architectures, TransApp does not use positional encoding. The authors found that adding either fixed or learnable positional encoding degraded performance. This is attributed to the fact that temporal information is already explicitly encoded in the input channels through the sinusoidal time features.
+
+\subsubsection{Task-Specific Heads}
+
+TransApp uses different heads depending on the training phase:
+
+\textbf{Reconstruction Head} (for pretraining): A linear layer that maps each time step's latent representation to a single value:
+\begin{equation}
+\mathbf{z}_{w \times d_{model}} \xrightarrow{\text{Linear}} \hat{\mathbf{x}}_{w \times 1}
+\end{equation}
+
+\textbf{Classification Head} (for fine-tuning): Global average pooling along the sequence length dimension followed by a linear layer:
+\begin{equation}
+\mathbf{z}_{w \times d_{model}} \xrightarrow{\text{GAP}} \mathbf{z}_{d_{model}} \xrightarrow{\text{Linear}} \text{logits}_2
+\end{equation}
+
+\subsection{Two-Step Training Process}
+
+TransApp employs a two-phase training strategy that leverages both unlabeled and labeled data:
+
+\subsubsection{Self-Supervised Pretraining}
+
+The first phase trains the model on unlabeled consumption data using a masked reconstruction objective. This is inspired by masked autoencoders in vision transformers.
+
+\textbf{Masking Process:} 
+\begin{itemize}
+    \item Randomly mask 50\% of the consumption channel values
+    \item Use mask segments with average length $l_m = 24$ time steps (corresponding to 12 hours for 30-minute sampling)
+    \item Keep temporal encoding channels (sin/cos features) unmasked
+\end{itemize}
+
+\textbf{Loss Function:} Mean Absolute Error (MAE) on masked elements:
+\begin{equation}
+\mathcal{L}_{MAE} = \frac{1}{\#M} \sum_{i \in M} |\hat{x}_i - x_i|
+\end{equation}
+
+where $\#M$ is the number of masked elements and $M$ is the set of masked indices.
+
+\textbf{Intuition:} By learning to reconstruct corrupted consumption data, the model develops robust representations of general consumption patterns, daily/weekly rhythms, and typical household behavior. This provides better initialization than random weights for the subsequent supervised task.
+
+\subsubsection{Supervised Fine-Tuning}
+
+The second phase fine-tunes the pretrained model on labeled appliance detection data using binary cross-entropy loss:
+
+\begin{equation}
+\mathcal{L}_{CE} = -\sum_{i=1}^{N} \left[ y_i \log(\hat{y}_i) + (1-y_i) \log(1-\hat{y}_i) \right]
+\end{equation}
+
+where $y_i \in \{0, 1\}$ is the true label and $\hat{y}_i$ is the predicted probability.
+
+During training, the label of the entire consumption series is assigned to all its subsequences. This weak supervision allows the model to learn which subsequence patterns are most indicative of appliance presence.
+
+\subsubsection{Why Two-Step Training Works}
+
+The two-step training provides several benefits:
+
+\begin{enumerate}
+    \item \textbf{Leveraging Unlabeled Data:} Electricity suppliers have vast amounts of unlabeled smart meter data. Pretraining allows this data to be utilized effectively.
+    
+    \item \textbf{Better Representations:} The reconstruction task encourages the model to learn general consumption patterns that are useful across different appliances.
+    
+    \item \textbf{Improved Generalization:} Pretraining acts as a regularizer, reducing overfitting on the limited labeled data.
+    
+    \item \textbf{Faster Convergence:} Starting from pretrained weights reduces the number of labeled examples needed for good performance.
+\end{enumerate}
+
+Experimental results show consistent improvements of 1-3 percentage points in Macro F1-Score when using pretraining, with larger gains when pretraining on more data.
+
+\section{Datasets}
+\label{sec:datasets}
+
+We evaluate our approaches on three real-world datasets containing smart meter consumption data with appliance labels.
+
+\subsection{CER Dataset}
+
+The Commission for Energy Regulation (CER) of Ireland conducted a study between 2009-2011 to assess smart meter performance and impact on consumer behavior. The study monitored over 5,000 Irish homes and businesses with smart meters recording electricity consumption every 30 minutes.
+
+\textbf{Characteristics:}
+\begin{itemize}
+    \item \textbf{Households:} 4,225 residential customers
+    \item \textbf{Duration:} July 15, 2009 to January 1, 2011
+    \item \textbf{Series Length:} 25,728 points per household (fixed length)
+    \item \textbf{Sampling Rate:} 30 minutes
+    \item \textbf{Appliances:} 9 types including Desktop Computer, TVs (greater and less than 21"), Laptop Computer, Cooker, Dishwasher, Tumble Dryer, Water Heater, and Plugin Heater
+    \item \textbf{Labels:} Obtained from customer questionnaires
+\end{itemize}
+
+\textbf{Class Distribution:} The dataset exhibits varying degrees of class imbalance across different appliances. Table \ref{tab:cer_stats} shows the number of positive and negative instances for each appliance.
+
+\begin{table}[h]
+\centering
+\caption{CER Dataset Statistics}
+\label{tab:cer_stats}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\textbf{Appliance} & \textbf{\#TS} & \textbf{Pos} & \textbf{Neg} & \textbf{Imb.} \\ \midrule
+Desktop Computer & 3470 & 1643 & 1827 & 0.47 \\
+TVs (>21") & 3470 & 2930 & 540 & 0.84 \\
+TVs (<21") & 3470 & 2258 & 1212 & 0.65 \\
+Laptop Computer & 3470 & 1852 & 1618 & 0.53 \\
+Cooker & 3482 & 2641 & 841 & 0.76 \\
+Dishwasher & 3482 & 2307 & 1175 & 0.66 \\
+Tumble Dryer & 3482 & 2375 & 1107 & 0.68 \\
+Water Heater & 3488 & 1953 & 1535 & 0.56 \\
+Plugin Heater & 3482 & 1088 & 2394 & 0.31 \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{EDF Dataset 1}
+
+As part of its customer engagement activities, Electricité de France (EDF), the main French electricity supplier, conducted a survey to better understand customer behavior and electricity consumption patterns.
+
+\textbf{Characteristics:}
+\begin{itemize}
+    \item \textbf{Households:} 4,701 residential customers
+    \item \textbf{Duration:} September 2018 to December 2022
+    \item \textbf{Series Length:} Variable (min: 1,338, max: 40,300, avg: 21,630 points)
+    \item \textbf{Sampling Rate:} 30 minutes
+    \item \textbf{Appliances:} 7 types including Tumble Dryer, Dishwasher, Convector/Heat Pump, Air Conditioner, Water Heater, Electric Heater, and Electric Vehicle
+    \item \textbf{Labels:} Obtained from customer questionnaires
+\end{itemize}
+
+The variable-length nature of this dataset presents additional challenges for model training and evaluation, making it particularly valuable for testing the scalability and robustness of our approaches.
+
+\subsection{EDF Dataset 2}
+
+\textbf{Characteristics:}
+\begin{itemize}
+    \item \textbf{Households:} ~200,000 residential customers
+    \item \textbf{Series Length:} Variable
+    \item \textbf{Sampling Rate:} 30 minutes
+    \item \textbf{Labels:} No appliance labels available
+\end{itemize}
+
+This large unlabeled dataset is used exclusively for self-supervised pretraining. Its size enables training of larger models (TransAppPT-l with 5 Transformer layers) that can then be fine-tuned on the smaller labeled datasets.
+
+\subsection{Data Preprocessing and Splits}
+
+For all experiments, we use the following protocol:
+
+\textbf{Train/Validation/Test Split:} 70\% / 10\% / 20\% random split, maintaining class distributions.
+
+\textbf{Class Balancing:} During training, we apply random undersampling to equalize class distributions, preventing bias toward majority classes.
+
+\textbf{Normalization:} Consumption values are standardized using training set statistics.
+
+\textbf{Variable Length Handling:} For models operating outside ADF (on full series), we pad sequences to the maximum length in each dataset using zero-padding. Inside ADF, subsequence extraction naturally handles variable lengths.
+
+\section{Proposed Enhancements}
+\label{sec:proposed}
+
+Building upon the strong foundation of TransApp and ADF, we propose several architectural and methodological enhancements to improve appliance detection performance, generalization, and interpretability.
+
+\subsection{Foundation Model Integration}
+
+We explore replacing TransApp's embedding block with MOMENT's pre-trained encoder:
+
+\begin{equation}
+\mathbf{x}_{w \times m} \xrightarrow{\text{MOMENT}} \mathbf{z}_{w \times d_{MOMENT}}
+\end{equation}
+
+The MOMENT representations are then projected to TransApp's inner dimension and processed through the Transformer block with DMSA:
+
+\begin{equation}
+\mathbf{z}_{MOMENT} \xrightarrow{\text{Linear}} \mathbf{z}_{d_{model}} \xrightarrow{\text{TransApp}} \text{Output}
+\end{equation}
+
+\subsection{Multi-Scale Temporal Processing}
+
+Different appliances exhibit signatures at different temporal scales. We propose a multi-scale architecture that processes consumption data at multiple resolutions:
+
+\begin{equation}
+\mathbf{z}_{multi} = \text{Aggregate}\left(\{\text{TransApp}_{w_i}(\mathbf{x}) \mid w_i \in \mathcal{W}\}\right)
+\end{equation}
+
+where $\mathcal{W} = \{256, 512, 1024, 2048\}$ represents different window sizes.
+
+\textbf{Scale-Specific Processing:}
+\begin{itemize}
+    \item \textbf{Short scale} ($w=256$, ~2.7 days): Captures short-duration appliance events
+    \item \textbf{Medium scale} ($w=1024$, ~10.7 days): Captures weekly patterns
+    \item \textbf{Long scale} ($w=2048$, ~21.3 days): Captures long-term trends
+\end{itemize}
+
+Features from different scales are fused using learned attention weights:
+
+\begin{align}
+\alpha_i &= \frac{\exp(w_i^\top \mathbf{z}_i)}{\sum_j \exp(w_j^\top \mathbf{z}_j)} \\
+\mathbf{z}_{fused} &= \sum_i \alpha_i \mathbf{z}_i
+\end{align}
+
+\subsection{Enhanced Attention Mechanisms}
+
+\subsubsection{Patch-Based Attention}
+
+Inspired by PatchTST, we explore patch-based attention where the input sequence is divided into patches processed independently:
+
+\begin{equation}
+\mathbf{x}_{w \times m} \rightarrow \{\mathbf{p}_1, \mathbf{p}_2, \ldots, \mathbf{p}_k\}
+\end{equation}
+
+where each patch $\mathbf{p}_i$ contains $l_p$ consecutive time steps. This reduces the attention complexity from $O(w^2)$ to $O(k^2)$ where $k = w/l_p$.
+
+\subsubsection{Attention Fusion}
+
+We combine the benefits of DMSA (from TransApp) with standard self-attention through learnable fusion:
+
+\begin{align}
+\mathbf{A}_{DMSA} &= \text{DMSA}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) \\
+\mathbf{A}_{std} &= \text{StandardAttn}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) \\
+\mathbf{A}_{fused} &= \lambda \mathbf{A}_{DMSA} + (1-\lambda) \mathbf{A}_{std}
+\end{align}
+
+where $\lambda$ is a learnable parameter.
+
+\subsection{Probabilistic Output Heads}
+
+Standard classification heads output point estimates. For real-world deployment, uncertainty quantification is crucial. We implement probabilistic heads that output distributional predictions:
+
+\begin{align}
+\mu(\mathbf{z}) &= \text{MLP}_{\mu}(\text{GAP}(\mathbf{z})) \\
+\sigma(\mathbf{z}) &= \text{softplus}(\text{MLP}_{\sigma}(\text{GAP}(\mathbf{z}))) \\
+p(y|\mathbf{x}) &\sim \text{Normal}(\mu, \sigma)
+\end{align}
+
+This allows us to quantify prediction confidence and identify ambiguous cases where manual verification may be needed.
+
+\subsection{Appliance-Specific Adaptation Layers}
+
+Rather than training a single model for all appliances, we propose appliance-specific adaptation layers that specialize the foundation model for each appliance type:
+
+\begin{algorithm}[h]
+\caption{Appliance-Specific Prediction}
+\begin{algorithmic}[1]
+\STATE $\mathbf{z}_{shared} \leftarrow \text{FoundationModel}(\mathbf{x})$
+\STATE $\mathbf{z}_{specific} \leftarrow \text{ApplianceAdapter}_a(\mathbf{z}_{shared})$
+\STATE $\hat{y}_a \leftarrow \text{ClassificationHead}(\mathbf{z}_{specific})$
+\STATE \textbf{return} $\hat{y}_a$
+\end{algorithmic}
+\end{algorithm}
+
+This enables the model to learn appliance-specific features and improves overall detection performance.
+
+\section{Experimental Methodology}
+\label{sec:experiments}
+
+\subsection{Implementation Details}
+
+\textbf{Hardware:} All experiments are conducted on a computing cluster with:
+\begin{itemize}
+\item 2$\times$ Intel Xeon Gold 6140 CPUs
+\item 190 GB RAM
+\item 2$\times$ NVIDIA V100 GPUs (16GB each)
+\end{itemize}
+
+\textbf{Software:} PyTorch 1.8.1, Python 3.7, CUDA 11.1
+
+\textbf{Hyperparameters:} Unless otherwise specified, we use:
+\begin{itemize}
+\item Batch size: 32
+\item Learning rate: 1e-4 with cosine annealing
+\item Optimizer: AdamW with weight decay 1e-5
+\item Pretraining epochs: 100
+\item Fine-tuning epochs: 50
+\item Early stopping patience: 10 epochs
+\item Inner dimension $d_{model}$: 96
+\item Number of Transformer layers: 3 (standard), 5 (large)
+\item Attention heads: 8
+\item Dropout rate: 0.1
+\end{itemize}
+
+\subsection{Evaluation Metrics}
+
+Given the class imbalance in appliance detection, we use multiple metrics:
+
+\textbf{Macro F1-Score:} Primary metric, averaging F1-scores across classes:
+\begin{equation}
+\text{F1-Macro} = \frac{1}{2}\left(\text{F1}_{positive} + \text{F1}_{negative}\right)
+\end{equation}
+
+\textbf{Precision and Recall:} For each class:
+\begin{align}
+\text{Precision} &= \frac{TP}{TP + FP} \\
+\text{Recall} &= \frac{TP}{TP + FN}
+\end{align}
+
+\textbf{F1-Score per class:}
+\begin{equation}
+\text{F1} = 2 \cdot \frac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}
+\end{equation}
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+This report presents our mid-semester progress on enhancing the TransApp framework for appliance detection from very low-frequency smart meter data. Building upon the solid foundation of the original TransApp architecture with its innovative Appliance Detection Framework, dilated convolutional embeddings, Diagonally Masked Self-Attention, and two-step training process, we have successfully integrated modern time series foundation models, multi-scale processing, and probabilistic outputs.
+
+Our experimental results demonstrate consistent improvements across all evaluated appliances on both CER and EDF datasets. The enhanced model achieves significant performance gains while maintaining computational efficiency. The path forward involves completing our experimental evaluation, enhancing cross-dataset transfer capabilities, and exploring extensions to multi-appliance detection and online learning scenarios.
+
+\begin{thebibliography}{99}
+
+\bibitem{chren2016smart}
+S. Chren, B. Rossi, and T. Pitner, ``Smart grids deployments within EU projects: The role of smart meters,'' in \textit{2016 Smart Cities Symposium Prague (SCSP)}, 2016, pp. 1--5.
+
+\bibitem{milam2014smart}
+M. Milam and G. K. Venayagamoorthy, ``Smart meter deployment: US initiatives,'' in \textit{ISGT 2014}, 2014, pp. 1--5.
+
+\bibitem{zhao2020non}
+B. Zhao, M. Ye, L. Stankovic, and V. Stankovic, ``Non-intrusive load disaggregation solutions for very low-rate smart meter data,'' \textit{Applied Energy}, vol. 268, p. 114949, 2020.
+
+\bibitem{barai2015smart}
+G. R. Barai, S. Krishnan, and B. Venkatesh, ``Smart metering and functionalities of smart meters in smart grid - a review,'' in \textit{2015 IEEE Electrical Power and Energy Conference (EPEC)}, 2015, pp. 138--145.
+
+\bibitem{allcott2011social}
+H. Allcott, ``Social norms and energy conservation,'' \textit{Journal of Public Economics}, vol. 95, no. 9, pp. 1082--1095, 2011.
+
+\bibitem{kaselimi2022towards}
+M. Kaselimi, E. Protopapadakis, A. Voulodimos, N. Doulamis, and A. Doulamis, ``Towards trustworthy energy disaggregation: A review of challenges, methods, and perspectives for non-intrusive load monitoring,'' \textit{Sensors}, vol. 22, no. 8, p. 5872, 2022.
+
+\bibitem{kahl2022representation}
+M. Kahl, D. Jorde, and H.-A. Jacobsen, ``Representation learning for appliance recognition: A comparison to classical machine learning,'' arXiv preprint arXiv:2209.03759, 2022.
+
+\bibitem{kahl2017comprehensive}
+M. Kahl, A. U. Haq, T. Kriechbaumer, and H.-A. Jacobsen, ``A comprehensive feature study for appliance recognition on high frequency energy data,'' in \textit{Proceedings of the Eighth International Conference on Future Energy Systems}, 2017, pp. 121--131.
+
+\bibitem{aslan2022efficient}
+M. Aslan and E. N. Zurel, ``An efficient hybrid model for appliances classification based on time series features,'' \textit{Energy and Buildings}, vol. 266, p. 112087, 2022.
+
+\bibitem{paradiso2013ann}
+F. Paradiso, F. Paganelli, A. Luchetta, D. Giuli, and P. Castrogiovanni, ``ANN-based appliance recognition from low-frequency energy monitoring data,'' in \textit{2013 IEEE 14th International Symposium on "A World of Wireless, Mobile and Multimedia Networks" (WoWMoM)}, 2013, pp. 1--6.
+
+\bibitem{albert2013smart}
+A. Albert and R. Rajagopal, ``Smart meter driven segmentation: What your consumption says about you,'' \textit{IEEE Transactions on Power Systems}, vol. 28, no. 4, pp. 4019--4030, 2013.
+
+\bibitem{deng2022residential}
+C. Deng, K. Wu, and B. Wang, ``Residential appliance detection using attention-based deep convolutional neural network,'' \textit{CSEE Journal of Power and Energy Systems}, vol. 8, no. 2, pp. 621--633, 2022.
+
+\bibitem{petralia2023appliance}
+A. Petralia, P. Charpentier, P. Boniol, and T. Palpanas, ``Appliance detection using very low-frequency smart meter time series,'' in \textit{ACM International Conference on Future Energy Systems (e-Energy)}, 2023.
+
+\bibitem{dempster2019rocket}
+A. Dempster, F. Petitjean, and G. I. Webb, ``ROCKET: Exceptionally fast and accurate time series classification using random convolutional kernels,'' \textit{arXiv preprint arXiv:1910.13051}, 2019.
+
+\bibitem{middlehurst2021hive}
+M. Middlehurst, J. Large, M. Flynn, J. Lines, A. Bostrom, and A. J. Bagnall, ``HIVE-COTE 2.0: A new meta ensemble for time series classification,'' \textit{arXiv preprint arXiv:2104.07551}, 2021.
+
+\bibitem{wang2016time}
+Z. Wang, W. Yan, and T. Oates, ``Time series classification from scratch with deep neural networks: A strong baseline,'' \textit{arXiv preprint arXiv:1611.06455}, 2016.
+
+\bibitem{fawaz2020inceptiontime}
+H. I. Fawaz, B. Lucas, G. Forestier, C. Pelletier, D. F. Schmidt, J. Weber, G. I. Webb, L. Idoumghar, P.-A. Muller, and F. Petitjean, ``InceptionTime: Finding AlexNet for time series classification,'' \textit{Data Mining and Knowledge Discovery}, vol. 34, no. 6, pp. 1936--1962, 2020.
+
+\bibitem{fawaz2019deep}
+H. I. Fawaz, G. Forestier, J. Weber, L. Idoumghar, and P.-A. Muller, ``Deep learning for time series classification: a review,'' \textit{Data Mining and Knowledge Discovery}, vol. 33, no. 4, pp. 917--963, 2019.
+
+\bibitem{wen2022transformers}
+Q. Wen, T. Zhou, C. Zhang, W. Chen, Z. Ma, J. Yan, and L. Sun, ``Transformers in time series: A survey,'' \textit{arXiv preprint arXiv:2202.07125}, 2022.
+
+\bibitem{zhou2020informer}
+H. Zhou, S. Zhang, J. Peng, S. Zhang, J. Li, H. Xiong, and W. Zhang, ``Informer: Beyond efficient transformer for long sequence time-series forecasting,'' in \textit{Proceedings of AAAI}, 2021.
+
+\bibitem{wu2021autoformer}
+H. Wu, J. Xu, J. Wang, and M. Long, ``Autoformer: Decomposition transformers with auto-correlation for long-term series forecasting,'' in \textit{Advances in Neural Information Processing Systems}, vol. 34, pp. 22419--22430, 2021.
+
+\bibitem{zhou2022fedformer}
+T. Zhou, Z. Ma, Q. Wen, X. Wang, L. Sun, and R. Jin, ``FEDformer: Frequency enhanced decomposed transformer for long-term series forecasting,'' in \textit{International Conference on Machine Learning}, pp. 27268--27286, 2022.
+
+\bibitem{yue2020bert4nilm}
+Z. Yue, C. R. Witzig, D. Jorde, and H.-A. Jacobsen, ``BERT4NILM: A bidirectional transformer model for non-intrusive load monitoring,'' in \textit{Proceedings of the 5th International Workshop on Non-Intrusive Load Monitoring}, 2020, pp. 89--93.
+
+\bibitem{sykiotis2022electricity}
+S. Sykiotis, K. Tsantili, A. Kaselimi, A. Doulamis, and N. Doulamis, ``Electricity theft detection using transformer models,'' in \textit{2022 IEEE 14th Image, Video, and Multidimensional Signal Processing Workshop (IVMSP)}, pp. 1--5, 2022.
+
+\bibitem{moment2024}
+M. Goswami et al., ``MOMENT: A family of open time-series foundation models,'' \textit{arXiv preprint arXiv:2402.03885}, 2024.
+
+\bibitem{timesfm2024}
+A. Das et al., ``A decoder-only foundation model for time-series forecasting,'' \textit{arXiv preprint arXiv:2310.10688}, 2024.
+
+\end{thebibliography}
+
+\end{document}

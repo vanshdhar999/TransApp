@@ -5,6 +5,9 @@ tmp/
 transapp-v1
 .python-version
 *.csv
+*.csv.gz
 *.pyc
+*.pt
 **/__pycache__/
 **/.ipynb_checkpoints/
+
