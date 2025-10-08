@@ -14,15 +14,26 @@ import pandas as pd
 
 import torch
 import torch.nn as nn
-
 from sklearn.preprocessing import StandardScaler
 from pathlib import Path
-root = Path(os.getcwd()).resolve().parents[0]
-sys.path.append(str(root))
-from experiments.data_utils import *
-from src.TransAppModel.TransApp_TST import *
-from src.AD_Framework.Framework import *
-from src.utils.losses import *
+
+# Fix path resolution - get to TransApp root directory
+current_file = Path(__file__).resolve()
+root = current_file.parents[1]  # Go up from experiments_tst/ to TransApp/
+sys.path.insert(0, str(root))  # Insert at beginning of path
+
+# Now import with correct paths
+try:
+    from experiments.data_utils import *
+    from src.TransAppModel.TransApp_TST import *
+    from src.AD_Framework.Framework import *
+    from src.utils.losses import *
+except ImportError as e:
+    print(f"Import error: {e}")
+    print(f"Current working directory: {os.getcwd()}")
+    print(f"Root directory: {root}")
+    print(f"Python path: {sys.path[:3]}")
+    sys.exit(1)
 
 def launch_pretraining(model, 
                        save_path, m, win,
@@ -144,7 +155,6 @@ def run_comparison_experiments():
     print(f"\n🎉 All TST comparison experiments completed!")
 
 if __name__ == "__main__":
-    print("🚀 TransApp with TST Architecture - Pretraining Suite")
     
     # Check if arguments are provided
     if len(sys.argv) >= 3:

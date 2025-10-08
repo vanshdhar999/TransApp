@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2025.10.8)  8 OCT 2025 19:59
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2025.10.8)  8 OCT 2025 22:47
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -425,14 +425,7 @@ Package hyperref Info: Link coloring OFF on input line 19.
 \@outlinefile=\write3
 \openout3 = `main.out'.
 
-LaTeX Font Info:    Trying to load font information for U+msa on input line 33.
- (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
-File: umsa.fd 2013/01/14 v3.01 AMS symbols A
-)
-LaTeX Font Info:    Trying to load font information for U+msb on input line 33.
- (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
-File: umsb.fd 2013/01/14 v3.01 AMS symbols B
-) [1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}
+ [1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}
 
 
 ]
@@ -445,21 +438,65 @@ Underfull \hbox (badness 1365) in paragraph at lines 86--87
 []\OT1/ptm/b/n/10 Probabilistic Out-puts: \OT1/ptm/m/n/10 We im-ple-ment prob-a-bilis-tic
  []
 
-[2] [3]
-Underfull \hbox (badness 1377) in paragraph at lines 283--284
+LaTeX Font Info:    Trying to load font information for U+msa on input line 96.
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Trying to load font information for U+msb on input line 96.
+ (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+) [2] [3]
+Underfull \hbox (badness 1377) in paragraph at lines 271--272
 []\OT1/ptm/b/n/10 Series Length: \OT1/ptm/m/n/10 25,728 points per house-hold (fixed
  []
 
 [4]
-Underfull \hbox (badness 2418) in paragraph at lines 363--364
-[]\OT1/ptm/m/n/10 The MO-MENT rep-re-sen-ta-tions are then pro-jected to
+Underfull \hbox (badness 10000) in paragraph at lines 418--419
+[]\OT1/ptm/m/n/10 Intermittent us-age: tum-bledryer[]case,
  []
 
-Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on input line 434.
 
-LaTeX Warning: `h' float specifier changed to `ht'.
+Underfull \hbox (badness 10000) in paragraph at lines 419--420
+[]\OT1/ptm/m/n/10 Computing de-vices: desk-top-com-puter[]case,
+ []
 
-[5] [6]
+
+Underfull \hbox (badness 1748) in paragraph at lines 432--433
+[]\OT1/ptm/b/n/10 Subsequence-level met-rics: \OT1/ptm/m/n/10 Tra-di-tional clas-si-fi-ca-tion
+ []
+
+
+Underfull \hbox (badness 3158) in paragraph at lines 443--444
+[]\OT1/ptm/m/n/10 Our ex-per-i-men-tal frame-work gen-er-ates com-pre-hen-sive
+ []
+
+[5]
+<actual_tst_performance_analysis.png, id=276, 1145.2386pt x 854.9541pt>
+File: actual_tst_performance_analysis.png Graphic file (type png)
+<use actual_tst_performance_analysis.png>
+Package pdftex.def Info: actual_tst_performance_analysis.png  used on input line 493.
+(pdftex.def)             Requested size: 464.39685pt x 346.68503pt.
+
+Underfull \hbox (badness 2608) in paragraph at lines 501--502
+[]\OT1/ptm/b/n/10 TST Ar-chi-tec-ture Val-i-da-tion: \OT1/ptm/m/n/10 The TST-enhanced
+ []
+
+
+Underfull \hbox (badness 1484) in paragraph at lines 532--533
+[]\OT1/ptm/b/n/10 Limited Dataset Cov-er-age: \OT1/ptm/m/n/10 Ex-per-i-ments con-ducted
+ []
+
+
+Underfull \hbox (badness 2409) in paragraph at lines 546--547
+\OT1/ptm/m/n/10 In-cep-tion-Time, ResNet vari-ants) and energy-specific
+ []
+
+
+Underfull \hbox (badness 1360) in paragraph at lines 552--553
+[]\OT1/ptm/b/n/10 Statistical Sig-nif-i-cance Test-ing: \OT1/ptm/m/n/10 Rig-or-ous sta-tis-ti-cal
+ []
+
+[6] [7 <./actual_tst_performance_analysis.png>]
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -471,7 +508,7 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[7
+[8
 
 ] (./main.aux)
  ***********
@@ -479,21 +516,21 @@ LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-22>
  ***********
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 1A5CC9850B9662649EBDC4377F627785;6250.
+(rerunfilecheck)             Checksum: B042E29699AA966D57CB7DD7487F6AF2;6605.
  ) 
 Here is how much of TeX's memory you used:
- 11631 strings out of 474222
- 179904 string characters out of 5748733
- 1951975 words of memory out of 5000000
- 33611 multiletter control sequences out of 15000+600000
- 601520 words of font info for 117 fonts, out of 8000000 for 9000
+ 11570 strings out of 474222
+ 179367 string characters out of 5748733
+ 1946975 words of memory out of 5000000
+ 33561 multiletter control sequences out of 15000+600000
+ 594519 words of font info for 99 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,11n,79p,1300b,579s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,12n,79p,1181b,583s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on main.pdf (7 pages, 223188 bytes).
+Output written on main.pdf (8 pages, 552485 bytes).
 PDF statistics:
- 388 PDF objects out of 1000 (max. 8388607)
- 345 compressed objects within 4 object streams
+ 392 PDF objects out of 1000 (max. 8388607)
+ 346 compressed objects within 4 object streams
  113 named destinations out of 1000 (max. 500000)
- 289 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 286 words of extra memory for PDF output out of 10000 (max. 10000000)
 

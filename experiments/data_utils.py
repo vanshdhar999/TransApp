@@ -8,7 +8,7 @@ from imblearn.under_sampling import RandomUnderSampler
 
 from src.utils import *
 
-path_data = str(Path(os.getcwd()).resolve().parents[0]) + '/data/'
+path_data = str(Path(os.getcwd()).resolve().parents[0]) + '/TransApp/data/'
 
 def CER_get_data_case(case_name, seed, exo_variable=[], win=1024, ratio_resample=0.8):
     data = pd.read_csv(path_data+'Inputs/x_residential_25728.csv').set_index('id_pdl')
@@ -545,7 +545,7 @@ def COMSTOCK_get_data_pretraining(resolution='15min', seed=0, win=1024, entire_c
     print(f"Loaded ComStock {resolution} data for pretraining: {data.shape}")
     
     # Validate and clean data before normalization
-    data = validate_comstock_data(data, f"ComStock_{resolution}_pretraining")
+    data = validate_comstock_data(data, f"Comstock_{resolution}_pretraining")
     
     # Normalize the data if requested
     if entire_curve_normalization:

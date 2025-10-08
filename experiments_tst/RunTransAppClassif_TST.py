@@ -16,15 +16,25 @@ from datetime import datetime
 
 import torch
 import torch.nn as nn
-
 from sklearn.preprocessing import StandardScaler
 from pathlib import Path
 
-root = Path(os.getcwd()).resolve().parents[0]
-sys.path.append(str(root))
-from experiments.data_utils import *
-from src.TransAppModel.TransApp_TST import *
-from src.AD_Framework.Framework import *
+# Fix path resolution - get to TransApp root directory
+current_file = Path(__file__).resolve()
+root = current_file.parents[1]  # Go up from experiments_tst/ to TransApp/
+sys.path.insert(0, str(root))  # Insert at beginning of path
+
+# Now import with correct paths
+try:
+    from experiments.data_utils import *
+    from src.TransAppModel.TransApp_TST import *
+    from src.AD_Framework.Framework import *
+except ImportError as e:
+    print(f"Import error: {e}")
+    print(f"Current working directory: {os.getcwd()}")
+    print(f"Root directory: {root}")
+    print(f"Python path: {sys.path[:3]}")
+    sys.exit(1)
 
 def clean_gpu_memory():
     """Clean GPU memory cache and collect garbage"""
@@ -264,9 +274,6 @@ if __name__ == "__main__":
 
     print(f"\n📋 Configuration:")
     print(f"   Case: {case_name} ({dataset_type})")
-    print(f"   Model: {model_name}")
-    print(f"   Dimension: {dim_model}")
-    print(f"   Epochs: {epochs}")
     print(f"   Normalization: {norm_type}")
 
     # Set up paths and parameters

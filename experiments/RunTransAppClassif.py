@@ -11,17 +11,28 @@
 import os, sys
 import numpy as np
 import pandas as pd
+from pathlib import Path
 
 import torch
 import torch.nn as nn
-
 from sklearn.preprocessing import StandardScaler
 
-root = Path(os.getcwd()).resolve().parents[0]
-sys.path.append(str(root))
-from experiments.data_utils import *
-from src.TransAppModel.TransApp import *
-from src.AD_Framework.Framework import *
+# Fix path resolution - get to TransApp root directory
+current_file = Path(__file__).resolve()
+root = current_file.parents[1]  # Go up from experiments/ to TransApp/
+sys.path.insert(0, str(root))  # Insert at beginning of path
+
+# Now import with correct paths
+try:
+    from experiments.data_utils import *
+    from src.TransAppModel.TransApp import *
+    from src.AD_Framework.Framework import *
+except ImportError as e:
+    print(f"Import error: {e}")
+    print(f"Current working directory: {os.getcwd()}")
+    print(f"Root directory: {root}")
+    print(f"Python path: {sys.path[:3]}")
+    sys.exit(1)
 
 def launch_training(model, 
                     save_path, m, win,
@@ -170,7 +181,7 @@ if __name__ == "__main__":
             model = get_model_inst(m=m, win=win, dim_model=dim_model, path_select_core=path_core)
 
             datas_tuple = CER_get_data_case(case_name, seed=rd_state, exo_variable=l,
-                                            win=win, ratio_resample=0.8, group='residential')
+                                            win=win, ratio_resample=0.8)
             launch_training(model, 
                             save_path, m, win, 
                             datas_tuple,  

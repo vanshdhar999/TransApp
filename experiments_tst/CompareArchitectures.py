@@ -17,17 +17,27 @@ from datetime import datetime
 
 import torch
 import torch.nn as nn
-
 from sklearn.preprocessing import StandardScaler
 from pathlib import Path
-root = Path(os.getcwd()).resolve().parents[0]
-sys.path.append(str(root))
 
-from experiments.data_utils import *
-from src.TransAppModel.TransApp import TransApp
-from src.TransAppModel.TransApp_TST import get_transapp_tst_model
-from src.AD_Framework.Framework import *
-from src.utils.losses import *
+# Fix path resolution - get to TransApp root directory
+current_file = Path(__file__).resolve()
+root = current_file.parents[1]  # Go up from experiments_tst/ to TransApp/
+sys.path.insert(0, str(root))  # Insert at beginning of path
+
+# Now import with correct paths
+try:
+    from experiments.data_utils import *
+    from src.TransAppModel.TransApp import TransApp
+    from src.TransAppModel.TransApp_TST import get_transapp_tst_model
+    from src.AD_Framework.Framework import *
+    from src.utils.losses import *
+except ImportError as e:
+    print(f"Import error: {e}")
+    print(f"Current working directory: {os.getcwd()}")
+    print(f"Root directory: {root}")
+    print(f"Python path: {sys.path[:3]}")
+    sys.exit(1)
 
 def get_model_standard(m, win, dim_model, mode="pretraining"):
     """Get standard TransApp model"""
@@ -135,7 +145,6 @@ def compare_architectures(embed_type=0, dim_model=64, epochs=10):
     
     results = []
     
-    # 1. Train Standard TransApp
     print(f"\n🔵 Creating Standard TransApp model...")
     model_standard = get_model_standard(m, win, dim_model, mode="pretraining")
     print(f"   Parameters: {sum(p.numel() for p in model_standard.parameters()):,}")

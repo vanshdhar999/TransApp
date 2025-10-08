@@ -1,0 +1,111 @@
+{
+  "timestamp": "2025-10-08T20:34:51.626522",
+  "summary": {
+    "total_experiments": 6,
+    "unique_cases": 1,
+    "unique_models": 1,
+    "embedding_types": [
+      "None",
+      "Embed"
+    ],
+    "normalization_types": [
+      "BatchNorm"
+    ]
+  },
+  "key_findings": [
+    "\ud83d\udcca Overall F1-Score: 0.546 \u00b1 0.040 (range: 0.493 to 0.598)",
+    "\ud83c\udfaf Embedding Impact: 0.533 vs 0.559 (-4.6% change)",
+    "\u274c Temporal embeddings show degradation compared to no embeddings",
+    "\ud83d\udcca Embedding effect is not statistically significant (p=0.4884)"
+  ],
+  "statistics": {
+    "performance_metrics": {
+      "accuracy": {
+        "count": 6.0,
+        "mean": 0.79220468675275,
+        "std": 0.015436860736703162,
+        "min": 0.7675753228120517,
+        "25%": 0.783715925394548,
+        "50%": 0.7962697274031565,
+        "75%": 0.8045193687230989,
+        "max": 0.806312769010043
+      },
+      "f1_score": {
+        "count": 6.0,
+        "mean": 0.5459893885074446,
+        "std": 0.0395197593696847,
+        "min": 0.49295774647887325,
+        "25%": 0.522289301135455,
+        "50%": 0.5422020381036774,
+        "75%": 0.5739237015474183,
+        "max": 0.5984251968503937
+      },
+      "precision": {
+        "count": 6.0,
+        "mean": 0.5766512551564803,
+        "std": 0.0392630302778893,
+        "min": 0.5269461077844312,
+        "25%": 0.5455783095566804,
+        "50%": 0.5796917344173442,
+        "75%": 0.6064510233918128,
+        "max": 0.624
+      },
+      "recall": {
+        "count": 6.0,
+        "mean": 0.5263908706964507,
+        "std": 0.08484410915008701,
+        "min": 0.43478260869565216,
+        "25%": 0.4707602339181286,
+        "50%": 0.5212850967999709,
+        "75%": 0.5447094711308759,
+        "max": 0.6745562130177515
+      },
+      "roc_auc": {
+        "count": 6.0,
+        "mean": 0.8023471378431624,
+        "std": 0.01660006665026611,
+        "min": 0.7810575234029307,
+        "25%": 0.7881757847725951,
+        "50%": 0.8070111597927102,
+        "75%": 0.8160885555005568,
+        "max": 0.8179913035682266
+      }
+    },
+    "embedding_performance": {
+      "mean": {
+        "Embed": 0.5331413419474496,
+        "None": 0.5588374350674398
+      },
+      "std": {
+        "Embed": 0.04356376187908982,
+        "None": 0.038878145548791494
+      },
+      "count": {
+        "Embed": 3,
+        "None": 3
+      }
+    },
+    "model_performance": {
+      "mean": {
+        "TransApp_TST": 0.5459893885074446
+      },
+      "std": {
+        "TransApp_TST": 0.03951975936968468
+      },
+      "count": {
+        "TransApp_TST": 6
+      }
+    },
+    "case_performance": {
+      "mean": {
+        "cooker_case": 0.5459893885074446
+      },
+      "std": {
+        "cooker_case": 0.03951975936968468
+      },
+      "count": {
+        "cooker_case": 6
+      }
+    }
+  }
+}
