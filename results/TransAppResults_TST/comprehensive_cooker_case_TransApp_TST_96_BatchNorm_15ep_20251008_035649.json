@@ -1,0 +1,334 @@
+{
+  "timestamp": "2025-10-08T03:56:49.125473",
+  "experiment_info": {
+    "case_name": "cooker_case",
+    "model_name": "TransApp_TST",
+    "dim_model": 96,
+    "epochs": 15,
+    "norm_type": "BatchNorm",
+    "dataset_type": "CER"
+  },
+  "all_results": [
+    {
+      "embed_name": "None",
+      "random_seed": 0,
+      "results": {
+        "subsequence_metrics": [
+          0.5660202348683653,
+          {
+            "ACCURACY": 0.7311648357923439,
+            "PRECISION": 0.4469649112731867,
+            "RECALL": 0.458241337690247,
+            "PRECISION_MACRO": 0.6360747175130835,
+            "RECALL_MACRO": 0.6383811844489227,
+            "F1_SCORE": 0.4525328875645032,
+            "F1_SCORE_MACRO": 0.6371860791636867,
+            "F1_SCORE_WEIGHTED": 0.732294394492391,
+            "CONFUSION_MATRIX": "[[15566 18403]\n [19260 86868]]"
+          }
+        ],
+        "quantile_metrics": {
+          "ACCURACY": 0.7804878048780488,
+          "PRECISION": 0.5377358490566038,
+          "RECALL": 0.6745562130177515,
+          "PRECISION_MACRO": 0.7121668936004668,
+          "RECALL_MACRO": 0.7444750762058454,
+          "F1_SCORE": 0.5984251968503937,
+          "F1_SCORE_MACRO": 0.7236943358388197,
+          "F1_SCORE_WEIGHTED": 0.7882160300954122,
+          "CONFUSION_MATRIX": "[[114  55]\n [ 98 430]]",
+          "ROC_AUC_SCORE": 0.817811995696611,
+          "ROC_AUC_SCORE_MACRO": 0.817811995696611,
+          "ROC_AUC_SCORE_WEIGHTED": 0.817811995696611
+        },
+        "best_quantile": null
+      },
+      "config": {
+        "embed_type": 0,
+        "exo_variables": [],
+        "random_seed": 0,
+        "dataset_type": "CER",
+        "norm_type": "BatchNorm",
+        "parameters": {
+          "lr": 0.0001,
+          "wd": 0.001,
+          "batch_size": 16,
+          "epochs": 15,
+          "p_es": 5,
+          "p_rlr": 3,
+          "n_warmup_epochs": 0
+        }
+      }
+    },
+    {
+      "embed_name": "None",
+      "random_seed": 1,
+      "results": {
+        "subsequence_metrics": [
+          0.5560930254910744,
+          {
+            "ACCURACY": 0.7336916564951427,
+            "PRECISION": 0.42417090663887697,
+            "RECALL": 0.42764438676184297,
+            "PRECISION_MACRO": 0.625913369687575,
+            "RECALL_MACRO": 0.6266322104597066,
+            "F1_SCORE": 0.42590056472833027,
+            "F1_SCORE_MACRO": 0.6262686223809861,
+            "F1_SCORE_WEIGHTED": 0.7340706620075944,
+            "CONFUSION_MATRIX": "[[13839 18522]\n [18787 88949]]"
+          }
+        ],
+        "quantile_metrics": {
+          "ACCURACY": 0.806312769010043,
+          "PRECISION": 0.5902777777777778,
+          "RECALL": 0.5279503105590062,
+          "PRECISION_MACRO": 0.7264227948563391,
+          "RECALL_MACRO": 0.7089378418466673,
+          "F1_SCORE": 0.5573770491803278,
+          "F1_SCORE_MACRO": 0.7167050535157837,
+          "F1_SCORE_WEIGHTED": 0.8024267201238124,
+          "CONFUSION_MATRIX": "[[ 85  76]\n [ 59 477]]",
+          "ROC_AUC_SCORE": 0.8109182349123945,
+          "ROC_AUC_SCORE_MACRO": 0.8109182349123945,
+          "ROC_AUC_SCORE_WEIGHTED": 0.8109182349123945
+        },
+        "best_quantile": null
+      },
+      "config": {
+        "embed_type": 0,
+        "exo_variables": [],
+        "random_seed": 1,
+        "dataset_type": "CER",
+        "norm_type": "BatchNorm",
+        "parameters": {
+          "lr": 0.0001,
+          "wd": 0.001,
+          "batch_size": 16,
+          "epochs": 15,
+          "p_es": 5,
+          "p_rlr": 3,
+          "n_warmup_epochs": 0
+        }
+      }
+    },
+    {
+      "embed_name": "None",
+      "random_seed": 2,
+      "results": {
+        "subsequence_metrics": [
+          0.5643924150212855,
+          {
+            "ACCURACY": 0.7348979635538234,
+            "PRECISION": 0.4538238335056532,
+            "RECALL": 0.39588606674231186,
+            "PRECISION_MACRO": 0.6326278111895013,
+            "RECALL_MACRO": 0.6204975611126764,
+            "F1_SCORE": 0.4228796966777512,
+            "F1_SCORE_MACRO": 0.6254038957814256,
+            "F1_SCORE_WEIGHTED": 0.7285546715085482,
+            "CONFUSION_MATRIX": "[[13607 20764]\n [16376 89350]]"
+          }
+        ],
+        "quantile_metrics": {
+          "ACCURACY": 0.7675753228120517,
+          "PRECISION": 0.5269461077844312,
+          "RECALL": 0.5146198830409356,
+          "PRECISION_MACRO": 0.6851711670997628,
+          "RECALL_MACRO": 0.6822148844862472,
+          "F1_SCORE": 0.5207100591715976,
+          "F1_SCORE_MACRO": 0.6836504841312534,
+          "F1_SCORE_WEIGHTED": 0.7666402271164439,
+          "CONFUSION_MATRIX": "[[ 88  83]\n [ 79 447]]",
+          "ROC_AUC_SCORE": 0.7810575234029307,
+          "ROC_AUC_SCORE_MACRO": 0.7810575234029307,
+          "ROC_AUC_SCORE_WEIGHTED": 0.7810575234029307
+        },
+        "best_quantile": null
+      },
+      "config": {
+        "embed_type": 0,
+        "exo_variables": [],
+        "random_seed": 2,
+        "dataset_type": "CER",
+        "norm_type": "BatchNorm",
+        "parameters": {
+          "lr": 0.0001,
+          "wd": 0.001,
+          "batch_size": 16,
+          "epochs": 15,
+          "p_es": 5,
+          "p_rlr": 3,
+          "n_warmup_epochs": 0
+        }
+      }
+    },
+    {
+      "embed_name": "Embed",
+      "random_seed": 0,
+      "results": {
+        "subsequence_metrics": [
+          0.5619815711112608,
+          {
+            "ACCURACY": 0.7308079402128526,
+            "PRECISION": 0.4463978925667163,
+            "RECALL": 0.4589478642291501,
+            "PRECISION_MACRO": 0.6358238595215466,
+            "RECALL_MACRO": 0.6383858121085446,
+            "F1_SCORE": 0.45258589406761207,
+            "F1_SCORE_MACRO": 0.6370529529022118,
+            "F1_SCORE_WEIGHTED": 0.7320653978399755,
+            "CONFUSION_MATRIX": "[[15590 18379]\n [19334 86794]]"
+          }
+        ],
+        "quantile_metrics": {
+          "ACCURACY": 0.806312769010043,
+          "PRECISION": 0.6118421052631579,
+          "RECALL": 0.5502958579881657,
+          "PRECISION_MACRO": 0.736196281989377,
+          "RECALL_MACRO": 0.7192767168728708,
+          "F1_SCORE": 0.5794392523364486,
+          "F1_SCORE_MACRO": 0.7268118908466958,
+          "F1_SCORE_WEIGHTED": 0.802718314412232,
+          "CONFUSION_MATRIX": "[[ 93  76]\n [ 59 469]]",
+          "ROC_AUC_SCORE": 0.8179913035682266,
+          "ROC_AUC_SCORE_MACRO": 0.8179913035682266,
+          "ROC_AUC_SCORE_WEIGHTED": 0.8179913035682266
+        },
+        "best_quantile": null
+      },
+      "config": {
+        "embed_type": 1,
+        "exo_variables": [
+          "hours_cos",
+          "hours_sin",
+          "days_cos",
+          "days_sin"
+        ],
+        "random_seed": 0,
+        "dataset_type": "CER",
+        "norm_type": "BatchNorm",
+        "parameters": {
+          "lr": 0.0001,
+          "wd": 0.001,
+          "batch_size": 16,
+          "epochs": 15,
+          "p_es": 5,
+          "p_rlr": 3,
+          "n_warmup_epochs": 0
+        }
+      }
+    },
+    {
+      "embed_name": "Embed",
+      "random_seed": 1,
+      "results": {
+        "subsequence_metrics": [
+          0.5470608108196521,
+          {
+            "ACCURACY": 0.7368037859483072,
+            "PRECISION": 0.4223888812439796,
+            "RECALL": 0.37940731126973826,
+            "PRECISION_MACRO": 0.6207541052141234,
+            "RECALL_MACRO": 0.6117816982575766,
+            "F1_SCORE": 0.39974604828338406,
+            "F1_SCORE_MACRO": 0.6155976601666503,
+            "F1_SCORE_WEIGHTED": 0.7317301629732856,
+            "CONFUSION_MATRIX": "[[12278 20083]\n [16790 90946]]"
+          }
+        ],
+        "quantile_metrics": {
+          "ACCURACY": 0.793400286944046,
+          "PRECISION": 0.5691056910569106,
+          "RECALL": 0.43478260869565216,
+          "PRECISION_MACRO": 0.7052845528455285,
+          "RECALL_MACRO": 0.6679510058403634,
+          "F1_SCORE": 0.49295774647887325,
+          "F1_SCORE_MACRO": 0.6816140083745718,
+          "F1_SCORE_WEIGHTED": 0.7831148666398328,
+          "CONFUSION_MATRIX": "[[ 70  91]\n [ 53 483]]",
+          "ROC_AUC_SCORE": 0.7831996848057848,
+          "ROC_AUC_SCORE_MACRO": 0.7831996848057848,
+          "ROC_AUC_SCORE_WEIGHTED": 0.7831996848057848
+        },
+        "best_quantile": null
+      },
+      "config": {
+        "embed_type": 1,
+        "exo_variables": [
+          "hours_cos",
+          "hours_sin",
+          "days_cos",
+          "days_sin"
+        ],
+        "random_seed": 1,
+        "dataset_type": "CER",
+        "norm_type": "BatchNorm",
+        "parameters": {
+          "lr": 0.0001,
+          "wd": 0.001,
+          "batch_size": 16,
+          "epochs": 15,
+          "p_es": 5,
+          "p_rlr": 3,
+          "n_warmup_epochs": 0
+        }
+      }
+    },
+    {
+      "embed_name": "Embed",
+      "random_seed": 2,
+      "results": {
+        "subsequence_metrics": [
+          0.5509598110414479,
+          {
+            "ACCURACY": 0.7372891639364155,
+            "PRECISION": 0.46007741766172416,
+            "RECALL": 0.40804748188880163,
+            "PRECISION_MACRO": 0.6372303740530529,
+            "RECALL_MACRO": 0.6261857446142645,
+            "F1_SCORE": 0.4325032765399738,
+            "F1_SCORE_MACRO": 0.6307933608562346,
+            "F1_SCORE_WEIGHTED": 0.731787593183742,
+            "CONFUSION_MATRIX": "[[14025 20346]\n [16459 89267]]"
+          }
+        ],
+        "quantile_metrics": {
+          "ACCURACY": 0.7991391678622669,
+          "PRECISION": 0.624,
+          "RECALL": 0.45614035087719296,
+          "PRECISION_MACRO": 0.7307062937062937,
+          "RECALL_MACRO": 0.6833933693549463,
+          "F1_SCORE": 0.527027027027027,
+          "F1_SCORE_MACRO": 0.6997612366464825,
+          "F1_SCORE_WEIGHTED": 0.7877392056779126,
+          "CONFUSION_MATRIX": "[[ 78  93]\n [ 47 479]]",
+          "ROC_AUC_SCORE": 0.803104084673026,
+          "ROC_AUC_SCORE_MACRO": 0.803104084673026,
+          "ROC_AUC_SCORE_WEIGHTED": 0.803104084673026
+        },
+        "best_quantile": null
+      },
+      "config": {
+        "embed_type": 1,
+        "exo_variables": [
+          "hours_cos",
+          "hours_sin",
+          "days_cos",
+          "days_sin"
+        ],
+        "random_seed": 2,
+        "dataset_type": "CER",
+        "norm_type": "BatchNorm",
+        "parameters": {
+          "lr": 0.0001,
+          "wd": 0.001,
+          "batch_size": 16,
+          "epochs": 15,
+          "p_es": 5,
+          "p_rlr": 3,
+          "n_warmup_epochs": 0
+        }
+      }
+    }
+  ]
+}
