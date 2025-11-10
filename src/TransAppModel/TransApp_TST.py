@@ -368,6 +368,7 @@ def get_transapp_tst_model(m, win, dim_model, mode="pretraining",
                           use_tst_pos_encoding=True, 
                           norm="BatchNorm",  # TST typically uses BatchNorm
                           res_attention=True,
+                          nb_class=2,  # Add nb_class as a parameter
                           **kwargs):
     """
     Get TransApp with TST architecture - drop-in replacement for get_model_inst
@@ -382,6 +383,7 @@ def get_transapp_tst_model(m, win, dim_model, mode="pretraining",
         use_tst_pos_encoding: bool - whether to use TST-style learnable positional encoding
         norm: str - normalization type ('BatchNorm' or 'LayerNorm')
         res_attention: bool - whether to use residual attention in TST
+        nb_class: int - number of classes for classification
     """
     
     encoding_type = "tst_learnable" if use_tst_pos_encoding else "noencoding"
@@ -395,7 +397,7 @@ def get_transapp_tst_model(m, win, dim_model, mode="pretraining",
         prenorm=True, norm=norm, activation='gelu',
         store_att=False, attn_dp_rate=0.2, head_dp_rate=0., dp_rate=0.2,
         att_param={'attenc_mask_diag': True, 'attenc_mask_flag': False, 'learnable_scale_enc': False},
-        c_reconstruct=1, apply_gap=True, nb_class=2,
+        c_reconstruct=1, apply_gap=True, nb_class=nb_class,  # Use the parameter
         # TST specific
         res_attention=res_attention,
         **kwargs

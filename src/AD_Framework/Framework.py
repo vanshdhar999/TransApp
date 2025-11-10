@@ -26,6 +26,12 @@ from torch.utils.data import DataLoader, Dataset
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, confusion_matrix, roc_auc_score
 
+# Suppress sklearn FutureWarnings about deprecated functions
+warnings.filterwarnings('ignore', category=FutureWarning, module='sklearn')
+warnings.filterwarnings('ignore', message='.*force_all_finite.*')
+warnings.filterwarnings('ignore', message='.*_check_n_features.*')
+warnings.filterwarnings('ignore', message='.*_check_feature_names.*')
+
 
 # ====================================== Pytorch TS Dataset Class ====================================== #
 
@@ -212,6 +218,17 @@ class self_pretrainer(object):
         self.passed_epochs = 0
         self.loss_train_history = []
         self.loss_valid_history = []
+    
+    def _get_predict_proba(self, X):
+        """
+        Safely access predict_proba method whether model is wrapped in DataParallel or not
+        """
+        if hasattr(self.model, 'module'):
+            # Model is wrapped in DataParallel, access the underlying model
+            return self.model.module.predict_proba(X)
+        else:
+            # Model is not wrapped
+            return self.model.predict_proba(X)
     
     def train(self, n_epochs=10):
         """
@@ -448,16 +465,37 @@ class BasedClassifTrainer(object):
             # =========== Data Parrallel Module call =========== #
             self.model = nn.DataParallel(self.model)
         self.model.to(self.device)
+
+    def _predict_proba(self, X):
+        """
+        Safely call predict_proba on the underlying model whether it's wrapped in
+        DataParallel or not. Returns whatever the model's predict_proba returns.
+        """
+        # If model was wrapped with nn.DataParallel it will have a `module` attr
+        if hasattr(self.model, 'module'):
+            return self.model.module.predict_proba(X)
+        else:
+            return self.model.predict_proba(X)
     
     def train(self, n_epochs=10):
         """
-        Public function : master training loop over epochs
+        Public function : master training loop over epochs with enhanced logging
         """
+        
+        import logging
+        logger = logging.getLogger()
         
         #flag_es = 0
         tmp_time = time.time()
         
+        if self.verbose:
+            logger.info(f"\n{'='*60}")
+            logger.info(f"TRAINING PROGRESS")
+            logger.info(f"{'='*60}")
+        
         for epoch in range(n_epochs):
+            epoch_start_time = time.time()
+            
             # =======================one epoch======================= #
             train_loss, train_accuracy = self.__train()
             self.loss_train_history.append(train_loss)
@@ -469,9 +507,15 @@ class BasedClassifTrainer(object):
             else:
                 valid_loss = train_loss
                 
+            epoch_time = time.time() - epoch_start_time
+
             # =======================reduce lr======================= #
             if self.scheduler:
+                old_lr = self.optimizer.param_groups[0]['lr']
                 self.scheduler.step(valid_loss)
+                new_lr = self.optimizer.param_groups[0]['lr']
+                if old_lr != new_lr and self.verbose:
+                    logger.info(f"    Learning rate reduced: {old_lr:.2e} -> {new_lr:.2e}")
 
             # ===================early stoppping=================== #
             if self.patience_es is not None:
@@ -481,19 +525,25 @@ class BasedClassifTrainer(object):
                         es_epoch = epoch+1
                         self.passed_epochs+=1
                         if self.verbose:
-                            print('Early stopping after {} epochs !'.format(epoch+1))
+                            logger.info(f'Early stopping triggered after epoch {epoch+1}!')
                         break
         
             # =======================verbose======================= #
             if self.verbose:
-                print(f"************************************Verbose is true************************************")
-                print('Epoch [{}/{}]'.format(epoch+1, n_epochs))
-                print('    Train loss : {:.4f}, Train acc : {:.2f}%'
-                          .format(train_loss, train_accuracy*100))
+                progress = f"Epoch [{epoch+1:3d}/{n_epochs:3d}]"
+                train_info = f"Train: loss={train_loss:.4f}, acc={train_accuracy*100:.2f}%"
                 
                 if self.valid_loader is not None:
-                    print('    Valid  loss : {:.4f}, Valid  acc : {:.2f}%'
-                              .format(valid_loss, valid_accuracy*100))
+                    valid_info = f"Valid: loss={valid_loss:.4f}, acc={valid_accuracy*100:.2f}%"
+                    epoch_info = f"{progress} | {train_info} | {valid_info} | Time: {epoch_time:.2f}s"
+                else:
+                    epoch_info = f"{progress} | {train_info} | Time: {epoch_time:.2f}s"
+                
+                # Add best model indicator
+                if valid_loss <= self.best_loss and self.passed_epochs >= self.n_warmup_epochs:
+                    epoch_info += " ⭐"
+                
+                logger.info(epoch_info)
 
             # =======================save log======================= #
             if valid_loss <= self.best_loss and self.passed_epochs>=self.n_warmup_epochs:
@@ -515,6 +565,15 @@ class BasedClassifTrainer(object):
             self.passed_epochs+=1
                     
         self.train_time = round((time.time() - tmp_time), 3)
+        
+        if self.verbose:
+            logger.info(f"\n{'='*60}")
+            logger.info(f"TRAINING SUMMARY")
+            logger.info(f"{'='*60}")
+            logger.info(f"Total training time: {self.train_time}s")
+            logger.info(f"Total epochs completed: {self.passed_epochs}")
+            logger.info(f"Best validation loss: {self.best_loss:.6f}")
+            logger.info(f"Best model saved at epoch: {self.log.get('epoch_best_loss', 'N/A')}")
 
         if self.plotloss:
             self.plot_history()
@@ -540,8 +599,14 @@ class BasedClassifTrainer(object):
     
     def evaluate(self, test_loader, mask='test_metrics', return_output=False):
         """
-        Public function : model evaluation on test dataset
+        Public function : model evaluation on test dataset with enhanced logging
         """
+        import logging
+        logger = logging.getLogger()
+        
+        if self.verbose:
+            logger.info(f"\nEvaluating model on {len(test_loader)} batches...")
+        
         tmp_time = time.time()
         mean_loss_eval = []
         y = np.array([])
@@ -566,6 +631,13 @@ class BasedClassifTrainer(object):
         self.log['eval_time'] = self.eval_time
         self.log[mask] = metrics
         
+        if self.verbose:
+            logger.info(f"Evaluation completed in {self.eval_time}s")
+            logger.info(f"Evaluation metrics ({mask}):")
+            for metric_name, metric_value in metrics.items():
+                if metric_name != 'CONFUSION_MATRIX':
+                    logger.info(f"  {metric_name}: {metric_value:.4f}")
+        
         if self.save_checkpoint:
             self.save()
         
@@ -573,7 +645,7 @@ class BasedClassifTrainer(object):
             return np.mean(mean_loss_eval), metrics, y, y_hat
         else:
             return np.mean(mean_loss_eval), metrics
-    
+
     def save(self):
         """
         Public function : save log
@@ -688,10 +760,7 @@ class BasedClassifTrainer(object):
     
 class AD_Framework(BasedClassifTrainer):
     """
-    Appliance Detection Framework class : child of BasedClassifTrainer
-    
-    Class Based on BasedClassifTrainer : 
-    This class is made for training/testing and evaluating a deep Pytorch model on binary appliance classification cases
+    Appliance Detection Framework class : child of BasedClassifTrainer with enhanced logging
     """
     def __init__(self,
                  model, 
@@ -729,8 +798,7 @@ class AD_Framework(BasedClassifTrainer):
         self.batch_size_voter = batch_size_voter
     
     def ADFvoter(self, dataset_voter, win, m=1, 
-                 mask='test_voter_metrics',
-                 mask_time='test_voter_time', 
+                 mask='test_voter_metrics', 
                  mask1='bestthreshold_valid_voter_metrics',
                  mask2='Threshold_voter',
                  n_best_pred=None, threshold=None, return_output=False):
@@ -753,7 +821,7 @@ class AD_Framework(BasedClassifTrainer):
 
         metrics = self._apply_metrics(y, y_hat)
         self.voter_time = round((time.time() - tmp_time), 3)
-        self.log[mask_time] = self.voter_time
+        self.log['test_voter_time'] = self.voter_time
         self.log[mask] = metrics
 
         if self.save_checkpoint:
@@ -767,7 +835,6 @@ class AD_Framework(BasedClassifTrainer):
         
     def ADFvoter_proba(self, dataset_voter, m, win, average_mode='quantile', q=None, threshold=None,
                        mask='test_voterproba_metrics', 
-                       mask_time='test_probavoter_time', 
                        mask1='bestquantile_valid_voter_metrics',
                        mask2='quantile',
                        return_output=False): 
@@ -793,7 +860,7 @@ class AD_Framework(BasedClassifTrainer):
                 
         metrics = self._apply_metrics(y, y_hat, y_hat_prob)
         self.voter_time = round((time.time() - tmp_time), 3)
-        self.log[mask_time] = self.voter_time
+        self.log['test_probavoter_time'] = self.voter_time
         self.log[mask] = metrics
         
         if self.save_checkpoint:
@@ -823,39 +890,26 @@ class AD_Framework(BasedClassifTrainer):
             inst_ts, inst_label = tmp_data[:, :win * m], tmp_data[:, win * m:]
 
             inst_ts = np.reshape(inst_ts, (inst_ts.shape[0], m, inst_ts.shape[1]//m))
-            y.append(inst_label.flatten()[0])
-
-            ts_dataset = TSDataset(inst_ts, inst_label, scaler=self.scale_by_subseq_in_voter, scale_dim=self.scale_dim)
-            loader = torch.utils.data.DataLoader(ts_dataset, batch_size=self.batch_size_voter)
-
-            with torch.no_grad():
-                logits_proba = []
-
-                for ts, labels in loader:
-                    self.model.eval()
-                    # ===================variables=================== #
-                    ts = Variable(ts.float()).to(self.device)
-                    labels = Variable(labels.float()).to(self.device)
-                    # ====================forward==================== #
-                    logits = self.model(ts)
-                    logits = nn.Softmax(dim=1)(logits)
-                    if not logits_proba:
-                        logits_proba = list(logits[:, 1].cpu().detach().numpy().ravel())
-                    else:
-                        logits_proba = logits_proba + list(logits[:, 1].cpu().detach().numpy().ravel())
+            
+            if len(inst_ts.shape)==3 and inst_ts.shape[1]==1:
+                inst_ts = np.squeeze(inst_ts, axis=1)
                 
-                if average_mode=='mean':
-                    proba_inst = np.mean(np.array(logits_proba))
-                elif average_mode=='quantile':
-                    proba_inst = np.quantile(np.array(logits_proba), q=q)
+            y.append(inst_label.flatten()[0])
+            # Use safe wrapper that handles DataParallel-wrapped models
+            logits_proba = self._predict_proba(inst_ts)[:, 1]
 
-                y_hat_prob.append(proba_inst)
+            if average_mode=='mean':
+                proba_inst = np.mean(np.array(logits_proba))
+            elif average_mode=='quantile':
+                proba_inst = np.quantile(np.array(logits_proba), q=q)
 
-                if threshold is not None:
-                    if proba_inst > threshold:
-                        y_hat.append(1)
-                else:
-                    y_hat.append(np.rint(proba_inst))
+            y_hat_prob.append(proba_inst)
+
+            if threshold is not None:
+                if proba_inst > threshold:
+                    y_hat.append(1)
+            else:
+                y_hat.append(np.rint(proba_inst))
 
         return np.array(y), np.array(y_hat), np.array(y_hat_prob)
     
@@ -882,158 +936,27 @@ class AD_Framework(BasedClassifTrainer):
                 tmp[:, im, :] = np.reshape(inst_ts[:, im, :], (n_obs_per_win, win))
             inst_ts = tmp.astype(np.float32)
             del tmp
+            
+            if len(inst_ts.shape)==3 and inst_ts.shape[1]==1:
+                inst_ts = np.squeeze(inst_ts, axis=1)
 
-            ts_dataset = TSDataset(inst_ts, np.repeat(inst_label, len(inst_ts)), scaler=self.scale_by_subseq_in_voter, scale_dim=self.scale_dim)
-            loader = torch.utils.data.DataLoader(ts_dataset, batch_size=self.batch_size_voter)
-
-            with torch.no_grad():
-                logits_proba = []
-
-                for ts, labels in loader:
-                    self.model.eval()
-                    # ===================variables=================== #
-                    ts = Variable(ts.float()).to(self.device)
-                    labels = Variable(labels.float()).to(self.device)
-                    # ====================forward==================== #
-                    logits = self.model(ts)
-                    logits = nn.Softmax(dim=1)(logits)
-                    if not logits_proba:
-                        logits_proba = list(logits[:, 1].cpu().detach().numpy().ravel())
-                    else:
-                        logits_proba = logits_proba + list(logits[:, 1].cpu().detach().numpy().ravel())
+            # Use safe wrapper that handles DataParallel-wrapped models
+            logits_proba = self._predict_proba(inst_ts)[:, 1]
                 
-                if average_mode=='mean':
-                    proba_inst = np.mean(np.array(logits_proba))
-                elif average_mode=='quantile':
-                    proba_inst = np.quantile(np.array(logits_proba), q=q)
+            if average_mode=='mean':
+                proba_inst = np.mean(logits_proba)
+            elif average_mode=='quantile':
+                proba_inst = np.quantile(logits_proba, q=q)
 
-                y_hat_prob[i] = proba_inst
+            y_hat_prob[i] = proba_inst
 
-                if threshold is not None:
-                    if proba_inst > threshold:
-                        y_hat[i] = 1
-                else:
-                    y_hat[i] = np.rint(proba_inst)
+            if threshold is not None:
+                if proba_inst > threshold:
+                    y_hat[i] = 1
+            else:
+                y_hat[i] = np.rint(proba_inst)
                 
         return y, y_hat, y_hat_prob
-    
-    
-    def _ADFvoter_df(self, dataset_voter, m, win, threshold, n_best_pred=None):
-    
-        y = []
-        y_hat = []
-
-        list_index = dataset_voter.index.unique()
-                
-        for i, id_pdl in enumerate(list_index):
-            tmp_data = dataset_voter.loc[id_pdl].copy()
-    
-            if len(tmp_data.shape)==1:
-                tmp_data = np.reshape(tmp_data.values, (1, len(tmp_data.values)))
-            else:
-                tmp_data = tmp_data.values
-            inst_ts, inst_label = tmp_data[:, :win * m], tmp_data[:, win * m:]
-
-            inst_ts = np.reshape(inst_ts, (inst_ts.shape[0], m, inst_ts.shape[1]//m))
-            y.append(inst_label.flatten()[0])
-
-            ts_dataset = TSDataset(inst_ts, inst_label, scaler=self.scale_by_subseq_in_voter, scale_dim=self.scale_dim)
-            loader = torch.utils.data.DataLoader(ts_dataset, batch_size=1)
-
-            with torch.no_grad():
-                final_pred = 0
-                if n_best_pred is not None:
-                    predicteds = []
-                    prob_predicteds = []
-
-                for ts, labels in loader:
-                    self.model.eval()
-                    # ===================variables=================== #
-                    ts = Variable(ts.float()).to(self.device)
-                    labels = Variable(labels.float()).to(self.device)
-                    # ====================forward==================== #
-                    logits = self.model(ts)
-                    prob_predicted, predicted = torch.max(nn.Softmax(dim=1)(logits), 1)
-
-                    if n_best_pred is not None:
-                        predicteds.append(predicted.item())
-                        prob_predicteds.append(prob_predicted.item())
-                    else:
-                        final_pred += predicted.item()
-
-                if n_best_pred is not None:
-                    predicteds = np.array(predicteds)
-                    prob_predicteds = np.array(prob_predicteds)
-                    if n_best_pred < len(ts_dataset):
-                        idx = np.argsort(prob_predicteds)[-n_best_pred:]
-                    else:
-                        idx = np.argsort(prob_predicteds)[-len(ts_dataset):]
-                    final_pred = np.mean(predicteds[idx])
-                else:
-                    final_pred = final_pred / len(loader)
-
-                y_hat.append(1) if final_pred > threshold else y_hat.append(0)
-
-        return np.array(y), np.array(y_hat)
-    
-    
-    def _ADFvoter(self, dataset_voter, m, win, threshold, n_best_pred=None):
-        y = dataset_voter[:][1].flatten()
-        y_hat = np.zeros(y.shape)
-
-        for i, inst in enumerate(dataset_voter):
-            inst_ts, inst_label = inst
-            inst_ts = np.reshape(inst_ts, (inst_ts.shape[0], m, inst_ts.shape[1]//m))
-
-            if inst_ts.shape[-1] < win:
-                raise ValueError('Argument win need to be smaller than the time serie length, but received length = {} and win={}'
-                                  .format(inst_ts.shape[-1], win))
-
-            n_obs_per_win = inst_ts.shape[-1] // win
-            inst_ts = inst_ts[:, :, :n_obs_per_win*win]
-
-            tmp = np.empty((n_obs_per_win, m, win))
-            for im in range(m):
-                tmp[:, im, :] = np.reshape(inst_ts[:, im, :], (n_obs_per_win, win))
-            inst_ts = tmp.astype(np.float32)
-            del tmp
-
-            ts_dataset = TSDataset(inst_ts, np.repeat(inst_label, len(inst_ts)), scaler=self.scale_by_subseq_in_voter, scale_dim=self.scale_dim)
-            loader = torch.utils.data.DataLoader(ts_dataset, batch_size=1)
-
-            with torch.no_grad():
-                final_pred = 0
-                if n_best_pred is not None:
-                    predicteds = []
-                    prob_predicteds = []
-
-                for ts, labels in loader:
-                    self.model.eval()
-                    # ===================variables=================== #
-                    ts = Variable(ts.float()).to(self.device)
-                    labels = Variable(labels.float()).to(self.device)
-                    # ====================forward==================== #
-                    logits = self.model(ts)
-                    prob_predicted, predicted = torch.max(nn.Softmax(dim=1)(logits), 1)
-
-                    if n_best_pred is not None:
-                        predicteds.append(predicted.item())
-                        prob_predicteds.append(prob_predicted.item())
-                    else:
-                        final_pred += predicted.item()
-
-                if n_best_pred is not None:
-                    predicteds = np.array(predicteds)
-                    prob_predicteds = np.array(prob_predicteds)
-                    idx = np.argsort(prob_predicteds)[-n_best_pred:]
-                    final_pred = np.mean(predicteds[idx])
-                else:
-                    final_pred = final_pred / len(loader)
-
-                if final_pred > threshold:
-                    y_hat[i] = 1
-        
-        return np.array(y), np.array(y_hat)
         
         
     def ADFFindBestThreshold(self, dataset_voter, m, win, n_best_pred=None, 
@@ -1089,7 +1012,114 @@ class AD_Framework(BasedClassifTrainer):
                             threshold=None,
                             return_output=False): 
         
+        import logging
+        logger = logging.getLogger()
+        
+        if self.verbose:
+            logger.info(f"\nSearching for optimal quantile...")
+        
         tmp_time = time.time()
+        list_metrics = []
+        best_metrics = None
+
+        for quantile in np.arange(0.1, 1, 0.1):
+            
+            quantile = round(quantile, 2)
+            
+            if isinstance(dataset_voter, pd.core.frame.DataFrame):
+                y, y_hat, y_hat_prob = self._ADFvoterproba_df(dataset_voter=dataset_voter, m=m, win=win, average_mode='quantile',
+                                                              q=quantile, threshold=threshold)
+            else:
+                y, y_hat, y_hat_prob = self._ADFvoterproba(dataset_voter=dataset_voter, m=m, win=win, average_mode='quantile',
+                                                           q=quantile, threshold=threshold)
+            
+            metrics = self._apply_metrics(y, y_hat, y_hat_prob)
+            metrics['quantile'] = quantile
+            list_metrics.append(metrics)
+            
+            if self.verbose:
+                logger.info(f"  Quantile {quantile:.1f}: {maskmetric}={metrics[maskmetric]:.4f}")
+            
+            if best_metrics is not None:
+                if best_metrics[maskmetric] < metrics[maskmetric]:
+                    best_metrics = metrics
+                    self.log[maskbest] = best_metrics
+            else:
+                best_metrics = metrics
+                self.log[maskbest] = best_metrics
+        
+        self.voter_time = round((time.time() - tmp_time), 3)
+        self.log['valid_proba_voter_time'] = self.voter_time
+        self.log[mask] = list_metrics
+        
+        if self.verbose:
+            logger.info(f"Quantile search completed in {self.voter_time}s")
+            logger.info(f"Best quantile: {best_metrics['quantile']:.1f} with {maskmetric}={best_metrics[maskmetric]:.4f}")
+        
+        if self.save_checkpoint:
+            self.save()
+
+        if return_output:
+            return best_metrics, y, y_hat, y_hat_prob
+        else:
+            return best_metrics
+
+    def ADFvoter_proba(self, dataset_voter, m, win, average_mode='quantile', q=None, threshold=None,
+                       mask='test_voterproba_metrics', 
+                       mask_time='test_probavoter_time', 
+                       mask1='bestquantile_valid_voter_metrics',
+                       mask2='quantile',
+                       return_output=False): 
+        
+        import logging
+        logger = logging.getLogger()
+        
+        if self.verbose:
+            logger.info(f"\nEvaluating with voter probability aggregation...")
+        
+        tmp_time = time.time()
+        
+        if average_mode=='quantile':
+            if q is None:
+                try:
+                    q = self.log[mask1][mask2]
+                    if self.verbose:
+                        logger.info(f"Using optimal quantile: {q:.1f}")
+                except:
+                    warnings.warn('Average mode "quantile" but no optimize q found and no parameter q provided, set q=0.5 (median).')
+                    q = 0.5
+        if average_mode!='quantile' and average_mode!='mean':
+            raise ValueError('Only "mean" and "quantile" average mode arguments supported for voter proba, but got = {}'
+                              .format(average_mode))
+    
+        if isinstance(dataset_voter, pd.core.frame.DataFrame):
+            y, y_hat, y_hat_prob = self._ADFvoterproba_df(dataset_voter=dataset_voter, m=m, win=win, average_mode=average_mode,
+                                                          q=q, threshold=threshold)
+        else:
+            y, y_hat, y_hat_prob = self._ADFvoterproba(dataset_voter=dataset_voter, m=m, win=win, average_mode=average_mode,
+                                                       q=q, threshold=threshold)
+                
+        metrics = self._apply_metrics(y, y_hat, y_hat_prob)
+        self.voter_time = round((time.time() - tmp_time), 3)
+        self.log[mask_time] = self.voter_time
+        self.log[mask] = metrics
+        
+        if self.verbose:
+            logger.info(f"Voter evaluation completed in {self.voter_time}s")
+            logger.info(f"Final voter metrics:")
+            for metric_name, metric_value in metrics.items():
+                if metric_name != 'CONFUSION_MATRIX':
+                    logger.info(f"  {metric_name}: {metric_value:.4f}")
+        
+        if self.save_checkpoint:
+            self.save()
+
+        if return_output:
+            return metrics, y, y_hat, y_hat_prob
+        else:
+            return metrics
+
+    # ...existing code...
         list_metrics = []
         best_metrics = None
 
@@ -1159,6 +1189,17 @@ class BasedClassifTrainer_Sktime(object):
         self.train_time = 0
         self.test_time = 0
         self.log = {}
+    
+    def _predict_proba(self, X):
+        """
+        Safely call predict_proba on the underlying model whether it's wrapped in
+        DataParallel or not. For SKTime models, they usually don't use DataParallel,
+        but we keep this consistent.
+        """
+        if hasattr(self.model, 'module'):
+            return self.model.module.predict_proba(X)
+        else:
+            return self.model.predict_proba(X)
         
     def train(self, X_train, y_train, X_valid=None, y_valid=None):
         """
@@ -1201,7 +1242,7 @@ class BasedClassifTrainer_Sktime(object):
             
         pred = self.model.predict(X_test)
         if predict_proba:
-            metrics = self._apply_metrics(y_test.ravel(), pred, self.model.predict_proba(X_test))
+            metrics = self._apply_metrics(y_test.ravel(), pred, self._predict_proba(X_test))
         else:
             metrics = self._apply_metrics(y_test.ravel(), pred)
         self.log[mask] = metrics
@@ -1354,7 +1395,7 @@ class AD_Framework_Sktime(BasedClassifTrainer_Sktime):
                 inst_ts = np.squeeze(inst_ts, axis=1)
                 
             y.append(inst_label.flatten()[0])
-            logits_proba = self.model.predict_proba(inst_ts)[:, 1]
+            logits_proba = self._predict_proba(inst_ts)[:, 1]
 
             if average_mode=='mean':
                 proba_inst = np.mean(np.array(logits_proba))
@@ -1398,7 +1439,7 @@ class AD_Framework_Sktime(BasedClassifTrainer_Sktime):
             if len(inst_ts.shape)==3 and inst_ts.shape[1]==1:
                 inst_ts = np.squeeze(inst_ts, axis=1)
 
-            logits_proba = self.model.predict_proba(inst_ts)[:, 1]
+            logits_proba = self._predict_proba(inst_ts)[:, 1]
                 
             if average_mode=='mean':
                 proba_inst = np.mean(logits_proba)

@@ -166,7 +166,7 @@ def get_model_inst_tst(m, win, dim_model, norm_type="BatchNorm", path_select_cor
     # Load pretrained weights if provided
     if path_select_core is not None:
         try:
-            checkpoint = torch.load(path_select_core)
+            checkpoint = torch.load(path_select_core, weights_only=False)
             # Handle different checkpoint formats
             if 'model_state_dict' in checkpoint:
                 state_dict = checkpoint['model_state_dict']

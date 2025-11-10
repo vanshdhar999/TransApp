@@ -7,7 +7,7 @@ transapp-v1
 *.csv
 *.csv.gz
 *.pyc
-.log
+*.log
 *.pt
 **/__pycache__/
 **/.ipynb_checkpoints/

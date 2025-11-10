@@ -1,0 +1,116 @@
+Focused Fine-tuning Experiment log started at: Tue Oct 28 03:26:12 PM IST 2025
+[0;34m==================================================================================[0m
+[0;34m🔬 EXPERIMENT 1: TransApp Fine-tuning with Pretrained Weights[0m
+[0;34m📁 Results stored in: results/TransAppResults/[0m
+[0;34m💡 Using pretrained weights: results/TransAppPretrained/Embed/TransApp96.pt[0m
+[0;34m==================================================================================[0m
+[0;34m==================================================================================[0m
+[0;34m🔬 EXPERIMENT 2: TST Fine-tuning with Pretrained Weights[0m
+[0;34m📁 Results stored in: results/TransAppResults_TST/[0m
+[0;34m💡 Using pretrained weights: results/TransAppPretrained_TST/Embed/TransApp_TST_96_BatchNorm.pt[0m
+[0;34m==================================================================================[0m
+[1;33m🎯 Running TST Fine-tuning for: cooker_case[0m
+🚀 TST-Enhanced TransApp experiments on appliance detection cases
+
+📋 Configuration:
+   Case: cooker_case (CER)
+   Normalization: BatchNorm
+
+======================================================================
+RUNNING EXPERIMENT: None embedding
+======================================================================
+
+🎲 Running random seed 0...
+⚠️  Missing keys when loading pretrained weights: ['W_pos']
+✅ Loaded pretrained TST weights from: /home/user/vansh/ISP/TransApp/results/TransAppPretrained_TST/None/TransApp_TST_96_BatchNorm.pt
+🎯 Starting TST fine-tuning for cooker_case...
+📊 Data shapes:
+   Training: (235622, 1, 128), (235622,)
+   Validation: (111957, 1, 128), (111957,)
+   Test: (140097, 1, 128), (140097,)
+   Voter test: (697, 25728), (697, 1)
+🏋️ Training TST model for 15 epochs...
+📊 Evaluating TST model...
+Restored best model met during training.
+🔍 Finding best quantile on validation voter dataset...
+❌ Error in seed 0 for None embedding: 'TransApp_TST' object has no attribute 'predict_proba'
+
+🎲 Running random seed 1...
+⚠️  Missing keys when loading pretrained weights: ['W_pos']
+✅ Loaded pretrained TST weights from: /home/user/vansh/ISP/TransApp/results/TransAppPretrained_TST/None/TransApp_TST_96_BatchNorm.pt
+🎯 Starting TST fine-tuning for cooker_case...
+📊 Data shapes:
+   Training: (247833, 1, 128), (247833,)
+   Validation: (111957, 1, 128), (111957,)
+   Test: (140097, 1, 128), (140097,)
+   Voter test: (697, 25728), (697, 1)
+🏋️ Training TST model for 15 epochs...
+📊 Evaluating TST model...
+Restored best model met during training.
+🔍 Finding best quantile on validation voter dataset...
+❌ Error in seed 1 for None embedding: 'TransApp_TST' object has no attribute 'predict_proba'
+
+🎲 Running random seed 2...
+⚠️  Missing keys when loading pretrained weights: ['W_pos']
+✅ Loaded pretrained TST weights from: /home/user/vansh/ISP/TransApp/results/TransAppPretrained_TST/None/TransApp_TST_96_BatchNorm.pt
+🎯 Starting TST fine-tuning for cooker_case...
+📊 Data shapes:
+   Training: (237883, 1, 128), (237883,)
+   Validation: (111957, 1, 128), (111957,)
+   Test: (140097, 1, 128), (140097,)
+   Voter test: (697, 25728), (697, 1)
+🏋️ Training TST model for 15 epochs...
+Traceback (most recent call last):
+  File "/home/user/vansh/ISP/TransApp/experiments_tst/RunTransAppClassif_TST.py", line 352, in <module>
+    results = launch_training_tst(model, save_path, m, win, datas_tuple, dict_params, case_name)
+  File "/home/user/vansh/ISP/TransApp/experiments_tst/RunTransAppClassif_TST.py", line 112, in launch_training_tst
+    model_trainer.train(dict_params['epochs'])
+  File "/home/user/vansh/ISP/TransApp/src/AD_Framework/Framework.py", line 500, in train
+    train_loss, train_accuracy = self.__train()
+  File "/home/user/vansh/ISP/TransApp/src/AD_Framework/Framework.py", line 710, in __train
+    logits = self.model(ts)
+  File "/home/user/anaconda3/envs/vansh_transapp/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/user/anaconda3/envs/vansh_transapp/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/user/vansh/ISP/TransApp/src/TransAppModel/TransApp_TST.py", line 341, in forward
+    x = self.EmbedBlock(x)  # [B, L, D]
+  File "/home/user/anaconda3/envs/vansh_transapp/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/user/anaconda3/envs/vansh_transapp/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/user/anaconda3/envs/vansh_transapp/lib/python3.9/site-packages/torch/nn/modules/container.py", line 244, in forward
+    input = module(input)
+  File "/home/user/anaconda3/envs/vansh_transapp/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/user/anaconda3/envs/vansh_transapp/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/user/vansh/ISP/TransApp/src/TransAppModel/TransApp.py", line 89, in forward
+    x = self.network(x)
+  File "/home/user/anaconda3/envs/vansh_transapp/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/user/anaconda3/envs/vansh_transapp/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/user/anaconda3/envs/vansh_transapp/lib/python3.9/site-packages/torch/nn/modules/container.py", line 244, in forward
+    input = module(input)
+  File "/home/user/anaconda3/envs/vansh_transapp/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/user/anaconda3/envs/vansh_transapp/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/user/vansh/ISP/TransApp/src/TransAppModel/TransApp.py", line 73, in forward
+    return torch.add(x, self.layers(x))
+  File "/home/user/anaconda3/envs/vansh_transapp/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/user/anaconda3/envs/vansh_transapp/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/user/anaconda3/envs/vansh_transapp/lib/python3.9/site-packages/torch/nn/modules/container.py", line 244, in forward
+    input = module(input)
+  File "/home/user/anaconda3/envs/vansh_transapp/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/user/anaconda3/envs/vansh_transapp/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/user/vansh/ISP/TransApp/src/TransAppModel/TransApp.py", line 27, in forward
+    return conv1d_same_padding(input, self.weight, self.bias, self.stride,
+  File "/home/user/vansh/ISP/TransApp/src/TransAppModel/TransApp.py", line 38, in conv1d_same_padding
+    return F.conv1d(input=input, weight=weight, bias=bias, stride=stride,
+KeyboardInterrupt

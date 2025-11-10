@@ -7,7 +7,7 @@ def create_comstock_structure(resolution):
     """
     Create the directory structure for ComStock data similar to CER format
     """
-    base_path = Path(f"/home/vanshdhar/Desktop/ISP/TransApp/data/Comstock_{resolution}")
+    base_path = Path(f"/home/user/vansh/ISP/TransApp/data/Comstock_{resolution}")
     
     # Create main directories
     inputs_dir = base_path / "Inputs"
@@ -162,9 +162,9 @@ def main():
     
     # Define available resolutions and their corresponding files
     resolutions = {
-        '15min': {
-            'labels_file': "/home/vanshdhar/Desktop/ISP/TransApp/data/Comstock/comstock_15min_labels.csv",
-            'input_file': "/home/vanshdhar/Desktop/ISP/TransApp/data/Comstock/comstock_merged_15_Min.csv"
+        '30min': {
+            'labels_file': "/home/user/vansh/ISP/TransApp/data/Comstock/comstock_30min_labels.csv",
+            'input_file': "/home/user/vansh/ISP/TransApp/data/Comstock/comstock_merged_30_Min.csv"
         }
         # Add more resolutions here as needed
         # '1hour': {

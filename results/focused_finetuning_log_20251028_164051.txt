@@ -1,0 +1,501 @@
+Focused Fine-tuning Experiment log started at: Tue Oct 28 04:40:51 PM IST 2025
+[0;34m==================================================================================[0m
+[0;34m🔬 EXPERIMENT 1: TransApp Fine-tuning with Pretrained Weights[0m
+[0;34m📁 Results stored in: results/TransAppResults/[0m
+[0;34m💡 Using pretrained weights: results/TransAppPretrained/Embed/TransApp96.pt[0m
+[0;34m==================================================================================[0m
+[0;34m==================================================================================[0m
+[0;34m🔬 EXPERIMENT 4: PatchTST Baseline[0m
+[0;34m📁 Results stored in: results/PatchTSTResults/[0m
+[0;34m💡 Using original PatchTST weights without pretraining[0m
+[0;34m==================================================================================[0m
+[1;33m🔍 Checking PatchTST CLI arguments...[0m
+usage: RunPatchTSTClassification.py [-h] [--cases CASES]
+                                    [--grid {quick,focused}]
+
+Run PatchTST Phase 1 experiments for one or more CER cases
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --cases CASES, -c CASES
+                        Comma-separated list of case names to run (e.g.
+                        cooker_case,tv_case). Default: cooker_case
+  --grid {quick,focused}, -g {quick,focused}
+                        Which hyperparameter grid to run: 'quick' (single
+                        test) or 'focused' (full grid). Default: quick
+[1;33m🎯 Running PatchTST for: cooker_case[0m
+🔬 Running quick test grid...
+
+============================================================
+🚀 Running PatchTST Phase 1 for case: cooker_case
+2025-10-28 16:40:54,236 - INFO - 🚀 Starting PatchTST experiment: patchtst_phase1_cooker_case
+2025-10-28 16:40:54,246 - INFO - 🖥️ Using device: cuda
+2025-10-28 16:40:54,246 - INFO - 🔬 Starting hyperparameter grid search for cooker_case
+2025-10-28 16:40:54,246 - INFO - 📊 Grid dimensions: 1 × 1 × 1 × 1 × 1 × 1 × 1 × 1 × 1
+2025-10-28 16:40:54,246 - INFO - 🎯 Total experiments to run: 1
+2025-10-28 16:40:54,246 - INFO - 
+================================================================================
+2025-10-28 16:40:54,246 - INFO - 🧪 Experiment 1/1
+2025-10-28 16:40:54,246 - INFO - ================================================================================
+2025-10-28 16:40:54,246 - INFO - ⚙️ Hyperparameter Configuration:
+2025-10-28 16:40:54,246 - INFO -   context_length: 96
+2025-10-28 16:40:54,246 - INFO -   patch_length: 16
+2025-10-28 16:40:54,246 - INFO -   stride: 8
+2025-10-28 16:40:54,246 - INFO -   hidden_size: 64
+2025-10-28 16:40:54,246 - INFO -   num_hidden_layers: 3
+2025-10-28 16:40:54,246 - INFO -   num_attention_heads: 2
+2025-10-28 16:40:54,247 - INFO -   dropout: 0.1
+2025-10-28 16:40:54,247 - INFO -   hidden_dropout_prob: 0.1
+2025-10-28 16:40:54,247 - INFO -   attention_probs_dropout_prob: 0.1
+2025-10-28 16:40:54,247 - INFO -   learning_rate: 0.0001
+2025-10-28 16:40:54,247 - INFO -   weight_decay: 0.001
+2025-10-28 16:40:54,247 - INFO -   batch_size: 32
+2025-10-28 16:40:54,247 - INFO -   epochs: 15
+2025-10-28 16:40:54,247 - INFO -   patience_early_stopping: 5
+2025-10-28 16:40:54,247 - INFO -   patience_lr_reduction: 3
+2025-10-28 16:40:54,247 - INFO -   embed_type: 0
+2025-10-28 16:40:54,247 - INFO -   random_seed: 0
+2025-10-28 16:41:18,015 - INFO - 📊 Dataset Information:
+2025-10-28 16:41:18,016 - INFO -   Training samples: 314,163
+2025-10-28 16:41:18,016 - INFO -   Validation samples: 149,276
+2025-10-28 16:41:18,016 - INFO -   Test samples: 186,796
+✅ Using original PatchTSTForClassification
+2025-10-28 16:41:18,493 - INFO - 🏗️ Model Architecture:
+2025-10-28 16:41:18,493 - INFO -   Total parameters: 255,554
+2025-10-28 16:41:18,493 - INFO -   Trainable parameters: 250,306
+2025-10-28 16:41:18,493 - INFO -   Model size: 0.97 MB
+2025-10-28 16:41:19,311 - INFO - 🏋️ Starting training for 15 epochs...
+2025-10-28 16:42:35,249 - INFO - Epoch [ 1] - Loss: 0.664741 | Val: 0.602473 | LR: 1.00e-04 | Time: 75.9s
+2025-10-28 16:43:30,870 - INFO - Epoch [ 2] - Loss: 0.652840 | Val: 0.621063 | LR: 1.00e-04 | Time: 55.6s
+2025-10-28 16:44:02,524 - INFO - Epoch [ 3] - Loss: 0.650497 | Val: 0.607411 | LR: 1.00e-04 | Time: 31.7s
+2025-10-28 16:44:34,948 - INFO - Epoch [ 4] - Loss: 0.649204 | Val: 0.622277 | LR: 1.00e-04 | Time: 32.4s
+2025-10-28 16:45:06,881 - INFO - Epoch [ 5] - Loss: 0.648491 | Val: 0.619854 | LR: 5.00e-05 | Time: 31.9s
+2025-10-28 16:45:38,732 - INFO - Epoch [ 6] - Loss: 0.646039 | Val: 0.618106 | LR: 5.00e-05 | Time: 31.9s
+2025-10-28 16:45:38,732 - INFO - ⏰ Early stopping at epoch 6
+2025-10-28 16:45:38,732 - INFO - 🔍 Evaluating model...
+2025-10-28 16:45:44,403 - INFO - 🎯 Final Results:
+metric: accuracy, value: 0.7012623396646609
+metric: precision_binary, value: 0.8155760945612549
+metric: recall_binary, value: 0.7826139190411578
+metric: f1_binary, value: 0.7987550894554057
+metric: precision_macro, value: 0.6062746482098388
+metric: recall_macro, value: 0.6148563722203935
+metric: f1_macro, value: 0.6096513679730846
+metric: f1_weighted, value: 0.7070519935285412
+metric: roc_auc, value: 0.6649213728685571
+metric: confusion_matrix, value: [[20250, 25042], [30761, 110743]]
+2025-10-28 16:45:44,404 - INFO - ✅ Experiment 1 completed: F1-Macro=0.6097, F1-Binary=0.7988
+2025-10-28 16:45:44,404 - INFO - 💾 Results saved to: /home/user/vansh/ISP/TransApp/results/PatchTSTResults/patchtst_cooker_case_phase1_20251028_164544.json
+
+============================================================
+🎉 Completed experiments for case: cooker_case
+📊 Total successful experiments: 1
+🏆 Best F1-Macro: 0.6097
+🎯 Best F1-Binary: 0.7988
+📈 Best ROC-AUC: 0.6649
+
+🔧 Best hyperparameters:
+  context_length: 96
+  patch_length: 16
+  stride: 8
+  hidden_size: 64
+  num_hidden_layers: 3
+  num_attention_heads: 2
+  dropout: 0.1
+  hidden_dropout_prob: 0.1
+  attention_probs_dropout_prob: 0.1
+  learning_rate: 0.0001
+  weight_decay: 0.001
+  batch_size: 32
+  epochs: 15
+  patience_early_stopping: 5
+  patience_lr_reduction: 3
+  embed_type: 0
+  random_seed: 0
+
+💾 Overall summary saved to: /home/user/vansh/ISP/TransApp/results/PatchTSTResults/patchtst_overall_summary_20251028_164544.json
+[0;32m✅ Completed PatchTST for: cooker_case[0m
+----------------------------------------
+[1;33m🎯 Running PatchTST for: dishwasher_case[0m
+🔬 Running quick test grid...
+
+============================================================
+🚀 Running PatchTST Phase 1 for case: dishwasher_case
+2025-10-28 16:45:45,717 - INFO - 🚀 Starting PatchTST experiment: patchtst_phase1_dishwasher_case
+2025-10-28 16:45:45,738 - INFO - 🖥️ Using device: cuda
+2025-10-28 16:45:45,738 - INFO - 🔬 Starting hyperparameter grid search for dishwasher_case
+2025-10-28 16:45:45,738 - INFO - 📊 Grid dimensions: 1 × 1 × 1 × 1 × 1 × 1 × 1 × 1 × 1
+2025-10-28 16:45:45,738 - INFO - 🎯 Total experiments to run: 1
+2025-10-28 16:45:45,738 - INFO - 
+================================================================================
+2025-10-28 16:45:45,738 - INFO - 🧪 Experiment 1/1
+2025-10-28 16:45:45,738 - INFO - ================================================================================
+2025-10-28 16:45:45,738 - INFO - ⚙️ Hyperparameter Configuration:
+2025-10-28 16:45:45,738 - INFO -   context_length: 96
+2025-10-28 16:45:45,738 - INFO -   patch_length: 16
+2025-10-28 16:45:45,738 - INFO -   stride: 8
+2025-10-28 16:45:45,738 - INFO -   hidden_size: 64
+2025-10-28 16:45:45,738 - INFO -   num_hidden_layers: 3
+2025-10-28 16:45:45,738 - INFO -   num_attention_heads: 2
+2025-10-28 16:45:45,738 - INFO -   dropout: 0.1
+2025-10-28 16:45:45,738 - INFO -   hidden_dropout_prob: 0.1
+2025-10-28 16:45:45,738 - INFO -   attention_probs_dropout_prob: 0.1
+2025-10-28 16:45:45,738 - INFO -   learning_rate: 0.0001
+2025-10-28 16:45:45,738 - INFO -   weight_decay: 0.001
+2025-10-28 16:45:45,738 - INFO -   batch_size: 32
+2025-10-28 16:45:45,738 - INFO -   epochs: 15
+2025-10-28 16:45:45,738 - INFO -   patience_early_stopping: 5
+2025-10-28 16:45:45,738 - INFO -   patience_lr_reduction: 3
+2025-10-28 16:45:45,738 - INFO -   embed_type: 0
+2025-10-28 16:45:45,738 - INFO -   random_seed: 0
+2025-10-28 16:45:58,561 - INFO - 📊 Dataset Information:
+2025-10-28 16:45:58,561 - INFO -   Training samples: 451,647
+2025-10-28 16:45:58,561 - INFO -   Validation samples: 149,276
+2025-10-28 16:45:58,561 - INFO -   Test samples: 186,796
+✅ Using original PatchTSTForClassification
+2025-10-28 16:45:58,818 - INFO - 🏗️ Model Architecture:
+2025-10-28 16:45:58,818 - INFO -   Total parameters: 255,554
+2025-10-28 16:45:58,818 - INFO -   Trainable parameters: 250,306
+2025-10-28 16:45:58,818 - INFO -   Model size: 0.97 MB
+2025-10-28 16:45:59,178 - INFO - 🏋️ Starting training for 15 epochs...
+2025-10-28 16:46:44,315 - INFO - Epoch [ 1] - Loss: 0.675014 | Val: 0.656626 | LR: 1.00e-04 | Time: 45.1s
+2025-10-28 16:47:29,428 - INFO - Epoch [ 2] - Loss: 0.672306 | Val: 0.648756 | LR: 1.00e-04 | Time: 45.1s
+2025-10-28 16:48:14,659 - INFO - Epoch [ 3] - Loss: 0.671751 | Val: 0.662903 | LR: 1.00e-04 | Time: 45.2s
+2025-10-28 16:48:59,695 - INFO - Epoch [ 4] - Loss: 0.671518 | Val: 0.629945 | LR: 1.00e-04 | Time: 45.0s
+2025-10-28 16:49:44,338 - INFO - Epoch [ 5] - Loss: 0.670915 | Val: 0.715775 | LR: 1.00e-04 | Time: 44.6s
+2025-10-28 16:50:29,100 - INFO - Epoch [ 6] - Loss: 0.668934 | Val: 0.670751 | LR: 1.00e-04 | Time: 44.8s
+2025-10-28 16:51:14,027 - INFO - Epoch [ 7] - Loss: 0.666569 | Val: 0.639330 | LR: 1.00e-04 | Time: 44.9s
+2025-10-28 16:51:58,995 - INFO - Epoch [ 8] - Loss: 0.664889 | Val: 0.647466 | LR: 5.00e-05 | Time: 45.0s
+2025-10-28 16:52:43,623 - INFO - Epoch [ 9] - Loss: 0.663090 | Val: 0.643025 | LR: 5.00e-05 | Time: 44.6s
+2025-10-28 16:52:43,623 - INFO - ⏰ Early stopping at epoch 9
+2025-10-28 16:52:43,624 - INFO - 🔍 Evaluating model...
+2025-10-28 16:52:49,035 - INFO - 🎯 Final Results:
+metric: accuracy, value: 0.6353883380800446
+metric: precision_binary, value: 0.695194807059871
+metric: recall_binary, value: 0.790497730167543
+metric: f1_binary, value: 0.7397895637689021
+metric: precision_macro, value: 0.5776731451667965
+metric: recall_macro, value: 0.5652659670738213
+metric: f1_macro, value: 0.5654334497431904
+metric: f1_weighted, value: 0.6197164866780247
+metric: roc_auc, value: 0.6107931207006502
+metric: confusion_matrix, value: [[21871, 42449], [25659, 96817]]
+2025-10-28 16:52:49,036 - INFO - ✅ Experiment 1 completed: F1-Macro=0.5654, F1-Binary=0.7398
+2025-10-28 16:52:49,037 - INFO - 💾 Results saved to: /home/user/vansh/ISP/TransApp/results/PatchTSTResults/patchtst_dishwasher_case_phase1_20251028_165249.json
+
+============================================================
+🎉 Completed experiments for case: dishwasher_case
+📊 Total successful experiments: 1
+🏆 Best F1-Macro: 0.5654
+🎯 Best F1-Binary: 0.7398
+📈 Best ROC-AUC: 0.6108
+
+🔧 Best hyperparameters:
+  context_length: 96
+  patch_length: 16
+  stride: 8
+  hidden_size: 64
+  num_hidden_layers: 3
+  num_attention_heads: 2
+  dropout: 0.1
+  hidden_dropout_prob: 0.1
+  attention_probs_dropout_prob: 0.1
+  learning_rate: 0.0001
+  weight_decay: 0.001
+  batch_size: 32
+  epochs: 15
+  patience_early_stopping: 5
+  patience_lr_reduction: 3
+  embed_type: 0
+  random_seed: 0
+
+💾 Overall summary saved to: /home/user/vansh/ISP/TransApp/results/PatchTSTResults/patchtst_overall_summary_20251028_165249.json
+[0;32m✅ Completed PatchTST for: dishwasher_case[0m
+----------------------------------------
+[1;33m🎯 Running PatchTST for: waterheater_case[0m
+🔬 Running quick test grid...
+
+============================================================
+🚀 Running PatchTST Phase 1 for case: waterheater_case
+2025-10-28 16:52:50,358 - INFO - 🚀 Starting PatchTST experiment: patchtst_phase1_waterheater_case
+2025-10-28 16:52:50,367 - INFO - 🖥️ Using device: cuda
+2025-10-28 16:52:50,368 - INFO - 🔬 Starting hyperparameter grid search for waterheater_case
+2025-10-28 16:52:50,368 - INFO - 📊 Grid dimensions: 1 × 1 × 1 × 1 × 1 × 1 × 1 × 1 × 1
+2025-10-28 16:52:50,368 - INFO - 🎯 Total experiments to run: 1
+2025-10-28 16:52:50,368 - INFO - 
+================================================================================
+2025-10-28 16:52:50,368 - INFO - 🧪 Experiment 1/1
+2025-10-28 16:52:50,368 - INFO - ================================================================================
+2025-10-28 16:52:50,368 - INFO - ⚙️ Hyperparameter Configuration:
+2025-10-28 16:52:50,368 - INFO -   context_length: 96
+2025-10-28 16:52:50,368 - INFO -   patch_length: 16
+2025-10-28 16:52:50,368 - INFO -   stride: 8
+2025-10-28 16:52:50,368 - INFO -   hidden_size: 64
+2025-10-28 16:52:50,368 - INFO -   num_hidden_layers: 3
+2025-10-28 16:52:50,368 - INFO -   num_attention_heads: 2
+2025-10-28 16:52:50,368 - INFO -   dropout: 0.1
+2025-10-28 16:52:50,368 - INFO -   hidden_dropout_prob: 0.1
+2025-10-28 16:52:50,368 - INFO -   attention_probs_dropout_prob: 0.1
+2025-10-28 16:52:50,368 - INFO -   learning_rate: 0.0001
+2025-10-28 16:52:50,368 - INFO -   weight_decay: 0.001
+2025-10-28 16:52:50,368 - INFO -   batch_size: 32
+2025-10-28 16:52:50,368 - INFO -   epochs: 15
+2025-10-28 16:52:50,368 - INFO -   patience_early_stopping: 5
+2025-10-28 16:52:50,368 - INFO -   patience_lr_reduction: 3
+2025-10-28 16:52:50,368 - INFO -   embed_type: 0
+2025-10-28 16:52:50,368 - INFO -   random_seed: 0
+2025-10-28 16:53:03,635 - INFO - 📊 Dataset Information:
+2025-10-28 16:53:03,635 - INFO -   Training samples: 585,513
+2025-10-28 16:53:03,635 - INFO -   Validation samples: 149,544
+2025-10-28 16:53:03,635 - INFO -   Test samples: 187,064
+✅ Using original PatchTSTForClassification
+2025-10-28 16:53:03,875 - INFO - 🏗️ Model Architecture:
+2025-10-28 16:53:03,875 - INFO -   Total parameters: 255,554
+2025-10-28 16:53:03,875 - INFO -   Trainable parameters: 250,306
+2025-10-28 16:53:03,875 - INFO -   Model size: 0.97 MB
+2025-10-28 16:53:04,231 - INFO - 🏋️ Starting training for 15 epochs...
+2025-10-28 16:54:01,870 - INFO - Epoch [ 1] - Loss: 0.683679 | Val: 0.684172 | LR: 1.00e-04 | Time: 57.6s
+2025-10-28 16:54:59,253 - INFO - Epoch [ 2] - Loss: 0.683080 | Val: 0.684446 | LR: 1.00e-04 | Time: 57.4s
+2025-10-28 16:55:56,229 - INFO - Epoch [ 3] - Loss: 0.683022 | Val: 0.684479 | LR: 1.00e-04 | Time: 57.0s
+2025-10-28 16:56:53,111 - INFO - Epoch [ 4] - Loss: 0.682961 | Val: 0.684807 | LR: 1.00e-04 | Time: 56.9s
+2025-10-28 16:57:51,329 - INFO - Epoch [ 5] - Loss: 0.682977 | Val: 0.684567 | LR: 5.00e-05 | Time: 58.2s
+2025-10-28 16:58:49,207 - INFO - Epoch [ 6] - Loss: 0.682659 | Val: 0.684194 | LR: 5.00e-05 | Time: 57.9s
+2025-10-28 16:58:49,207 - INFO - ⏰ Early stopping at epoch 6
+2025-10-28 16:58:49,207 - INFO - 🔍 Evaluating model...
+2025-10-28 16:58:54,622 - INFO - 🎯 Final Results:
+metric: accuracy, value: 0.5607385707565326
+metric: precision_binary, value: 0.564687547603145
+metric: recall_binary, value: 0.9245098415378122
+metric: f1_binary, value: 0.7011282707849884
+metric: precision_macro, value: 0.5421411123438751
+metric: recall_macro, value: 0.5136484386165611
+metric: f1_macro, value: 0.4363757772256696
+metric: f1_weighted, value: 0.4667199025619812
+metric: roc_auc, value: 0.5568531187812022
+metric: confusion_matrix, value: [[8512, 74300], [7870, 96382]]
+2025-10-28 16:58:54,623 - INFO - ✅ Experiment 1 completed: F1-Macro=0.4364, F1-Binary=0.7011
+2025-10-28 16:58:54,623 - INFO - 💾 Results saved to: /home/user/vansh/ISP/TransApp/results/PatchTSTResults/patchtst_waterheater_case_phase1_20251028_165854.json
+
+============================================================
+🎉 Completed experiments for case: waterheater_case
+📊 Total successful experiments: 1
+🏆 Best F1-Macro: 0.4364
+🎯 Best F1-Binary: 0.7011
+📈 Best ROC-AUC: 0.5569
+
+🔧 Best hyperparameters:
+  context_length: 96
+  patch_length: 16
+  stride: 8
+  hidden_size: 64
+  num_hidden_layers: 3
+  num_attention_heads: 2
+  dropout: 0.1
+  hidden_dropout_prob: 0.1
+  attention_probs_dropout_prob: 0.1
+  learning_rate: 0.0001
+  weight_decay: 0.001
+  batch_size: 32
+  epochs: 15
+  patience_early_stopping: 5
+  patience_lr_reduction: 3
+  embed_type: 0
+  random_seed: 0
+
+💾 Overall summary saved to: /home/user/vansh/ISP/TransApp/results/PatchTSTResults/patchtst_overall_summary_20251028_165854.json
+[0;32m✅ Completed PatchTST for: waterheater_case[0m
+----------------------------------------
+[1;33m🎯 Running PatchTST for: laptopcomputer_case[0m
+🔬 Running quick test grid...
+
+============================================================
+🚀 Running PatchTST Phase 1 for case: laptopcomputer_case
+2025-10-28 16:58:55,923 - INFO - 🚀 Starting PatchTST experiment: patchtst_phase1_laptopcomputer_case
+2025-10-28 16:58:55,933 - INFO - 🖥️ Using device: cuda
+2025-10-28 16:58:55,933 - INFO - 🔬 Starting hyperparameter grid search for laptopcomputer_case
+2025-10-28 16:58:55,933 - INFO - 📊 Grid dimensions: 1 × 1 × 1 × 1 × 1 × 1 × 1 × 1 × 1
+2025-10-28 16:58:55,933 - INFO - 🎯 Total experiments to run: 1
+2025-10-28 16:58:55,933 - INFO - 
+================================================================================
+2025-10-28 16:58:55,933 - INFO - 🧪 Experiment 1/1
+2025-10-28 16:58:55,933 - INFO - ================================================================================
+2025-10-28 16:58:55,933 - INFO - ⚙️ Hyperparameter Configuration:
+2025-10-28 16:58:55,933 - INFO -   context_length: 96
+2025-10-28 16:58:55,933 - INFO -   patch_length: 16
+2025-10-28 16:58:55,933 - INFO -   stride: 8
+2025-10-28 16:58:55,933 - INFO -   hidden_size: 64
+2025-10-28 16:58:55,933 - INFO -   num_hidden_layers: 3
+2025-10-28 16:58:55,933 - INFO -   num_attention_heads: 2
+2025-10-28 16:58:55,933 - INFO -   dropout: 0.1
+2025-10-28 16:58:55,933 - INFO -   hidden_dropout_prob: 0.1
+2025-10-28 16:58:55,933 - INFO -   attention_probs_dropout_prob: 0.1
+2025-10-28 16:58:55,933 - INFO -   learning_rate: 0.0001
+2025-10-28 16:58:55,933 - INFO -   weight_decay: 0.001
+2025-10-28 16:58:55,933 - INFO -   batch_size: 32
+2025-10-28 16:58:55,933 - INFO -   epochs: 15
+2025-10-28 16:58:55,933 - INFO -   patience_early_stopping: 5
+2025-10-28 16:58:55,933 - INFO -   patience_lr_reduction: 3
+2025-10-28 16:58:55,933 - INFO -   embed_type: 0
+2025-10-28 16:58:55,933 - INFO -   random_seed: 0
+2025-10-28 16:59:08,938 - INFO - 📊 Dataset Information:
+2025-10-28 16:59:08,939 - INFO -   Training samples: 594,960
+2025-10-28 16:59:08,939 - INFO -   Validation samples: 149,008
+2025-10-28 16:59:08,939 - INFO -   Test samples: 185,992
+✅ Using original PatchTSTForClassification
+2025-10-28 16:59:09,180 - INFO - 🏗️ Model Architecture:
+2025-10-28 16:59:09,180 - INFO -   Total parameters: 255,554
+2025-10-28 16:59:09,180 - INFO -   Trainable parameters: 250,306
+2025-10-28 16:59:09,180 - INFO -   Model size: 0.97 MB
+2025-10-28 16:59:09,527 - INFO - 🏋️ Starting training for 15 epochs...
+2025-10-28 17:00:07,362 - INFO - Epoch [ 1] - Loss: 0.685083 | Val: 0.686677 | LR: 1.00e-04 | Time: 57.8s
+2025-10-28 17:01:05,943 - INFO - Epoch [ 2] - Loss: 0.682216 | Val: 0.679059 | LR: 1.00e-04 | Time: 58.6s
+2025-10-28 17:02:03,265 - INFO - Epoch [ 3] - Loss: 0.679594 | Val: 0.687408 | LR: 1.00e-04 | Time: 57.3s
+2025-10-28 17:03:00,629 - INFO - Epoch [ 4] - Loss: 0.678700 | Val: 0.678597 | LR: 1.00e-04 | Time: 57.4s
+2025-10-28 17:03:57,339 - INFO - Epoch [ 5] - Loss: 0.678211 | Val: 0.680808 | LR: 1.00e-04 | Time: 56.7s
+2025-10-28 17:04:54,971 - INFO - Epoch [ 6] - Loss: 0.677935 | Val: 0.685059 | LR: 1.00e-04 | Time: 57.6s
+2025-10-28 17:05:52,491 - INFO - Epoch [ 7] - Loss: 0.677452 | Val: 0.680163 | LR: 1.00e-04 | Time: 57.5s
+2025-10-28 17:06:48,522 - INFO - Epoch [ 8] - Loss: 0.677109 | Val: 0.679496 | LR: 5.00e-05 | Time: 56.0s
+2025-10-28 17:07:45,930 - INFO - Epoch [ 9] - Loss: 0.675964 | Val: 0.678028 | LR: 5.00e-05 | Time: 57.4s
+2025-10-28 17:08:42,254 - INFO - Epoch [10] - Loss: 0.675714 | Val: 0.674640 | LR: 5.00e-05 | Time: 56.3s
+2025-10-28 17:09:38,010 - INFO - Epoch [11] - Loss: 0.675379 | Val: 0.675782 | LR: 5.00e-05 | Time: 55.8s
+2025-10-28 17:10:35,153 - INFO - Epoch [12] - Loss: 0.675269 | Val: 0.674992 | LR: 5.00e-05 | Time: 57.1s
+2025-10-28 17:11:31,085 - INFO - Epoch [13] - Loss: 0.675171 | Val: 0.678843 | LR: 5.00e-05 | Time: 55.9s
+2025-10-28 17:12:27,345 - INFO - Epoch [14] - Loss: 0.675123 | Val: 0.674760 | LR: 2.50e-05 | Time: 56.3s
+2025-10-28 17:13:24,144 - INFO - Epoch [15] - Loss: 0.674405 | Val: 0.674180 | LR: 2.50e-05 | Time: 56.8s
+2025-10-28 17:13:24,144 - INFO - 🔍 Evaluating model...
+2025-10-28 17:13:29,386 - INFO - 🎯 Final Results:
+metric: accuracy, value: 0.582933674566648
+metric: precision_binary, value: 0.5838323120772272
+metric: recall_binary, value: 0.7581282775312626
+metric: f1_binary, value: 0.6596613768685038
+metric: precision_macro, value: 0.5823720437878317
+metric: recall_macro, value: 0.5704970206524933
+metric: f1_macro, value: 0.5606009871271667
+metric: f1_weighted, value: 0.5671669495595896
+metric: roc_auc, value: 0.6029724945205843
+metric: confusion_matrix, value: [[33245, 53587], [23984, 75176]]
+2025-10-28 17:13:29,387 - INFO - ✅ Experiment 1 completed: F1-Macro=0.5606, F1-Binary=0.6597
+2025-10-28 17:13:29,388 - INFO - 💾 Results saved to: /home/user/vansh/ISP/TransApp/results/PatchTSTResults/patchtst_laptopcomputer_case_phase1_20251028_171329.json
+
+============================================================
+🎉 Completed experiments for case: laptopcomputer_case
+📊 Total successful experiments: 1
+🏆 Best F1-Macro: 0.5606
+🎯 Best F1-Binary: 0.6597
+📈 Best ROC-AUC: 0.6030
+
+🔧 Best hyperparameters:
+  context_length: 96
+  patch_length: 16
+  stride: 8
+  hidden_size: 64
+  num_hidden_layers: 3
+  num_attention_heads: 2
+  dropout: 0.1
+  hidden_dropout_prob: 0.1
+  attention_probs_dropout_prob: 0.1
+  learning_rate: 0.0001
+  weight_decay: 0.001
+  batch_size: 32
+  epochs: 15
+  patience_early_stopping: 5
+  patience_lr_reduction: 3
+  embed_type: 0
+  random_seed: 0
+
+💾 Overall summary saved to: /home/user/vansh/ISP/TransApp/results/PatchTSTResults/patchtst_overall_summary_20251028_171329.json
+[0;32m✅ Completed PatchTST for: laptopcomputer_case[0m
+----------------------------------------
+[1;33m🎯 Running PatchTST for: pluginheater_case[0m
+🔬 Running quick test grid...
+
+============================================================
+🚀 Running PatchTST Phase 1 for case: pluginheater_case
+2025-10-28 17:13:30,683 - INFO - 🚀 Starting PatchTST experiment: patchtst_phase1_pluginheater_case
+2025-10-28 17:13:30,693 - INFO - 🖥️ Using device: cuda
+2025-10-28 17:13:30,693 - INFO - 🔬 Starting hyperparameter grid search for pluginheater_case
+2025-10-28 17:13:30,693 - INFO - 📊 Grid dimensions: 1 × 1 × 1 × 1 × 1 × 1 × 1 × 1 × 1
+2025-10-28 17:13:30,693 - INFO - 🎯 Total experiments to run: 1
+2025-10-28 17:13:30,693 - INFO - 
+================================================================================
+2025-10-28 17:13:30,693 - INFO - 🧪 Experiment 1/1
+2025-10-28 17:13:30,693 - INFO - ================================================================================
+2025-10-28 17:13:30,693 - INFO - ⚙️ Hyperparameter Configuration:
+2025-10-28 17:13:30,693 - INFO -   context_length: 96
+2025-10-28 17:13:30,693 - INFO -   patch_length: 16
+2025-10-28 17:13:30,693 - INFO -   stride: 8
+2025-10-28 17:13:30,693 - INFO -   hidden_size: 64
+2025-10-28 17:13:30,693 - INFO -   num_hidden_layers: 3
+2025-10-28 17:13:30,693 - INFO -   num_attention_heads: 2
+2025-10-28 17:13:30,693 - INFO -   dropout: 0.1
+2025-10-28 17:13:30,693 - INFO -   hidden_dropout_prob: 0.1
+2025-10-28 17:13:30,693 - INFO -   attention_probs_dropout_prob: 0.1
+2025-10-28 17:13:30,693 - INFO -   learning_rate: 0.0001
+2025-10-28 17:13:30,693 - INFO -   weight_decay: 0.001
+2025-10-28 17:13:30,693 - INFO -   batch_size: 32
+2025-10-28 17:13:30,693 - INFO -   epochs: 15
+2025-10-28 17:13:30,693 - INFO -   patience_early_stopping: 5
+2025-10-28 17:13:30,693 - INFO -   patience_lr_reduction: 3
+2025-10-28 17:13:30,693 - INFO -   embed_type: 0
+2025-10-28 17:13:30,693 - INFO -   random_seed: 0
+2025-10-28 17:13:41,777 - INFO - 📊 Dataset Information:
+2025-10-28 17:13:41,777 - INFO -   Training samples: 69,300
+2025-10-28 17:13:41,777 - INFO -   Validation samples: 24,508
+2025-10-28 17:13:41,777 - INFO -   Test samples: 30,668
+✅ Using original PatchTSTForClassification
+2025-10-28 17:13:42,007 - INFO - 🏗️ Model Architecture:
+2025-10-28 17:13:42,007 - INFO -   Total parameters: 255,554
+2025-10-28 17:13:42,007 - INFO -   Trainable parameters: 250,306
+2025-10-28 17:13:42,007 - INFO -   Model size: 0.97 MB
+2025-10-28 17:13:42,352 - INFO - 🏋️ Starting training for 15 epochs...
+2025-10-28 17:13:49,372 - INFO - Epoch [ 1] - Loss: 0.684609 | Val: 0.643412 | LR: 1.00e-04 | Time: 7.0s
+2025-10-28 17:13:56,158 - INFO - Epoch [ 2] - Loss: 0.679603 | Val: 0.662361 | LR: 1.00e-04 | Time: 6.8s
+2025-10-28 17:14:02,982 - INFO - Epoch [ 3] - Loss: 0.677461 | Val: 0.651908 | LR: 1.00e-04 | Time: 6.8s
+2025-10-28 17:14:09,850 - INFO - Epoch [ 4] - Loss: 0.676265 | Val: 0.654907 | LR: 1.00e-04 | Time: 6.9s
+2025-10-28 17:14:16,742 - INFO - Epoch [ 5] - Loss: 0.676096 | Val: 0.647852 | LR: 5.00e-05 | Time: 6.9s
+2025-10-28 17:14:23,677 - INFO - Epoch [ 6] - Loss: 0.675487 | Val: 0.657546 | LR: 5.00e-05 | Time: 6.9s
+2025-10-28 17:14:23,677 - INFO - ⏰ Early stopping at epoch 6
+2025-10-28 17:14:23,677 - INFO - 🔍 Evaluating model...
+2025-10-28 17:14:24,558 - INFO - 🎯 Final Results:
+metric: accuracy, value: 0.6713838528759619
+metric: precision_binary, value: 0.41970224897054165
+metric: recall_binary, value: 0.29236540158870256
+metric: f1_binary, value: 0.34464819872545194
+metric: precision_macro, value: 0.5781684440221025
+metric: recall_macro, value: 0.5613835895186616
+metric: f1_macro, value: 0.5626805117392437
+metric: f1_weighted, value: 0.6518328922398615
+metric: roc_auc, value: 0.5877447294909428
+metric: confusion_matrix, value: [[17940, 3664], [6414, 2650]]
+2025-10-28 17:14:24,558 - INFO - ✅ Experiment 1 completed: F1-Macro=0.5627, F1-Binary=0.3446
+2025-10-28 17:14:24,558 - INFO - 💾 Results saved to: /home/user/vansh/ISP/TransApp/results/PatchTSTResults/patchtst_pluginheater_case_phase1_20251028_171424.json
+
+============================================================
+🎉 Completed experiments for case: pluginheater_case
+📊 Total successful experiments: 1
+🏆 Best F1-Macro: 0.5627
+🎯 Best F1-Binary: 0.3446
+📈 Best ROC-AUC: 0.5877
+
+🔧 Best hyperparameters:
+  context_length: 96
+  patch_length: 16
+  stride: 8
+  hidden_size: 64
+  num_hidden_layers: 3
+  num_attention_heads: 2
+  dropout: 0.1
+  hidden_dropout_prob: 0.1
+  attention_probs_dropout_prob: 0.1
+  learning_rate: 0.0001
+  weight_decay: 0.001
+  batch_size: 32
+  epochs: 15
+  patience_early_stopping: 5
+  patience_lr_reduction: 3
+  embed_type: 0
+  random_seed: 0
+
+💾 Overall summary saved to: /home/user/vansh/ISP/TransApp/results/PatchTSTResults/patchtst_overall_summary_20251028_171424.json
+[0;32m✅ Completed PatchTST for: pluginheater_case[0m
+----------------------------------------

@@ -2,13 +2,20 @@ import os, sys
 from pathlib import Path
 import numpy as np
 import pandas as pd
+import warnings
 
 from sklearn.preprocessing import StandardScaler
 from imblearn.under_sampling import RandomUnderSampler
 
+# Suppress sklearn FutureWarnings about deprecated functions
+warnings.filterwarnings('ignore', category=FutureWarning, module='sklearn')
+warnings.filterwarnings('ignore', message='.*force_all_finite.*')
+warnings.filterwarnings('ignore', message='.*_check_n_features.*')
+warnings.filterwarnings('ignore', message='.*_check_feature_names.*')
+
 from src.utils import *
 
-path_data = str(Path(os.getcwd()).resolve().parents[0]) + '/TransApp/data/'
+path_data = str(Path(os.getcwd()).resolve().parents[0]) + '/data/'
 
 def CER_get_data_case(case_name, seed, exo_variable=[], win=1024, ratio_resample=0.8):
     data = pd.read_csv(path_data+'Inputs/x_residential_25728.csv').set_index('id_pdl')
